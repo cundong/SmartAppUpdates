@@ -105,12 +105,18 @@ Link： [http://developer.android.com/about/versions/jelly-bean.html][1]
 > 3.引用ApkPatchLibrary，实现增量更新的ApkPatchLibraryDemo；<br/>
 > 4.旧版本的新浪微博Android客户端，以及服务端生成的新旧新浪微博差分包；<br/>
 
+## Blog
+
+[http://my.oschina.net/liucundong/blog][4]
+
 ## Update
 
 1.目前的做法只是提供了一个例子，并没有做成开源库，打算这几天改进一下，做成一个开源库，push到GitHub上，开发中。（2014年8月31日）
 
 2.已经大幅度重构原先代码，并将原来的Demo程序提取成为开源库，欢迎所有人Watch、Star、Fork。（2014年9月2日）
 
+
   [1]: http://developer.android.com/about/versions/jelly-bean.html
   [2]: http://www.daemonology.net/bsdiff/
   [3]: http://www.bzip.org/downloads.html
+  [4]: http://my.oschina.net/liucundong/blog

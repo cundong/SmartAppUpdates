@@ -40,14 +40,12 @@ Link： [http://developer.android.com/about/versions/jelly-bean.html][1]
  3. 3.0——>4.0的差异包；
 
 选择使用这个开源二进制比较工具来实现： 
-[http://www.daemonology.net/bsdiff/][2] 
-下载后得到bsdiff-4.3.tar.gz。 
+[http://www.daemonology.net/bsdiff/][2]<br/>下载后得到bsdiff-4.3.tar.gz。 
 
 其中bsdiff.c是二进制文件比对的代码；bspatch.c是二进制文件合成的代码； 
 我们将使用这个bsdiff来生成两个apk的patch包，并且使用bspatch.c来合成旧apk与patch包； 
 
-使用bsdiff、bspatch时，还需用到bzip2： [http://www.bzip.org/downloads.html][3]  
-下载后得到：bzip2-1.0.6.tar.gz。 
+使用bsdiff、bspatch时，还需用到bzip2： [http://www.bzip.org/downloads.html][3]<br/>下载后得到：bzip2-1.0.6.tar.gz。 
 
 我们需要用到bzip2-1.0.6.tar.gz中以下13个文件（这里面可能有的是不需要的，我都拷贝过来了）： 
 
@@ -101,17 +99,17 @@ Link： [http://developer.android.com/about/versions/jelly-bean.html][1]
 ## 代码说明
 
 源码中，包含以下文件： 
-1.服务器端生成差异包的工程：ApkPatchLibraryServer；
-2.客户端使用的开源apk合并库：ApkPatchLibrary；
-3.引用ApkPatchLibrary，实现增量更新的ApkPatchLibraryDemo；
-4.旧版本的新浪微博Android客户端，以及服务端生成的新旧新浪微博差分包；
+
+> 1.服务器端生成差异包的工程：ApkPatchLibraryServer；
+> 2.客户端使用的开源apk合并库：ApkPatchLibrary；
+> 3.引用ApkPatchLibrary，实现增量更新的ApkPatchLibraryDemo；
+> 4.旧版本的新浪微博Android客户端，以及服务端生成的新旧新浪微博差分包；
 
 ## Update
 
-### 1.目前的做法只是提供了一个例子，并没有做成开源库，打算这几天改进一下，做成一个开源库，push到GitHub上，开发中。（2014年8月31日）
+1.目前的做法只是提供了一个例子，并没有做成开源库，打算这几天改进一下，做成一个开源库，push到GitHub上，开发中。（2014年8月31日）
 
-###2.已经大幅度重构原先代码，并将原来的Demo程序提取成为开源库，欢迎所有人Watch、Star、Fork。（2014年9月2日）
-
+2.已经大幅度重构原先代码，并将原来的Demo程序提取成为开源库，欢迎所有人Watch、Star、Fork。（2014年9月2日）
 
   [1]: http://developer.android.com/about/versions/jelly-bean.html
   [2]: http://www.daemonology.net/bsdiff/

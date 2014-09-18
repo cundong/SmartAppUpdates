@@ -100,10 +100,10 @@ Link： [http://developer.android.com/about/versions/jelly-bean.html][1]
 
 源码中，包含以下文件： 
 
-> 1.服务器端生成差异包的工程：ApkPatchLibraryServer；
-> 2.客户端使用的开源apk合并库：ApkPatchLibrary；
-> 3.引用ApkPatchLibrary，实现增量更新的ApkPatchLibraryDemo；
-> 4.旧版本的新浪微博Android客户端，以及服务端生成的新旧新浪微博差分包；
+> 1.服务器端生成差异包的工程：ApkPatchLibraryServer；<br/>
+> 2.客户端使用的开源apk合并库：ApkPatchLibrary；<br/>
+> 3.引用ApkPatchLibrary，实现增量更新的ApkPatchLibraryDemo；<br/>
+> 4.旧版本的新浪微博Android客户端，以及服务端生成的新旧新浪微博差分包；<br/>
 
 ## Update
 

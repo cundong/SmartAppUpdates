@@ -1,0 +1,11 @@
+*.class
+
+gen/*
+
+bin/*
+
+obj/*
+
+Debug/*
+
+Release/*

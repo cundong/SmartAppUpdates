@@ -8,8 +8,11 @@
 				<externalSettings>
 					<externalSetting>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/app"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/ApkPatchLibraryServer"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/app/Debug"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/ApkPatchLibraryServer/Debug"/>
 						<entry flags="RESOLVED" kind="libraryFile" name="app" srcPrefixMapping="" srcRootPath=""/>
+						<entry flags="RESOLVED" kind="libraryFile" name="ApkPatchLibraryServer" srcPrefixMapping="" srcRootPath=""/>
 					</externalSetting>
 				</externalSettings>
 				<extensions>
@@ -73,8 +76,11 @@
 				<externalSettings>
 					<externalSetting>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/app"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/ApkPatchLibraryServer"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/app/Release"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/ApkPatchLibraryServer/Release"/>
 						<entry flags="RESOLVED" kind="libraryFile" name="app" srcPrefixMapping="" srcRootPath=""/>
+						<entry flags="RESOLVED" kind="libraryFile" name="ApkPatchLibraryServer" srcPrefixMapping="" srcRootPath=""/>
 					</externalSetting>
 				</externalSettings>
 				<extensions>

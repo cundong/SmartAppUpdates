@@ -8,37 +8,46 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal" >
+        android:orientation="horizontal"
+        android:padding="5dip" >
 
         <TextView
             android:id="@+id/textview1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/demo_info1" />
+            android:lineSpacingMultiplier="1.5"
+            android:text="@string/demo_info1"
+            android:textSize="14sp" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal" >
+        android:orientation="horizontal"
+        android:padding="5dip" >
 
         <TextView
             android:id="@+id/textview2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/demo_info2" />
+            android:lineSpacingMultiplier="1.5"
+            android:text="@string/demo_info2"
+            android:textSize="14sp" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal" >
+        android:orientation="horizontal"
+        android:padding="5dip" >
 
         <TextView
             android:id="@+id/textview3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/demo_info3" />
+            android:lineSpacingMultiplier="1.5"
+            android:text="@string/demo_info3"
+            android:textSize="14sp" />
     </LinearLayout>
 
     <Button

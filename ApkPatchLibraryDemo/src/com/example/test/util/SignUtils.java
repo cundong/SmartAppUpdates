@@ -1,4 +1,4 @@
-package com.cundong.apkpatch.utils;
+package com.example.test.util;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
@@ -77,7 +77,7 @@ public class SignUtils {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 		return null;
 	}
 
@@ -88,7 +88,8 @@ public class SignUtils {
 	 * @param packageName
 	 * @return
 	 */
-	public static String InstalledApkSignature(Context context, String packageName) {
+	public static String InstalledApkSignature(Context context,
+			String packageName) {
 		PackageManager pm = context.getPackageManager();
 		List<PackageInfo> apps = pm
 				.getInstalledPackages(PackageManager.GET_SIGNATURES);
@@ -101,7 +102,7 @@ public class SignUtils {
 				return packageinfo.signatures[0].toCharsString();
 			}
 		}
-		
+
 		return null;
 	}
 }

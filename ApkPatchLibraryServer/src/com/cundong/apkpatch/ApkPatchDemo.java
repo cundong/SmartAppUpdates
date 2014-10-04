@@ -4,10 +4,10 @@ import com.cundong.common.Constants;
 import com.cundong.utils.PatchUtils;
 
 /**
- * 类说明： Test
+ * 类说明：  使用旧版apk包+差分包，合并新包实例
  * 
- * @author Cundong
- * @date 2013-9-6
+ * @author  Cundong
+ * @date    2014-9-6
  * @version 1.0
  */
 public class ApkPatchDemo {

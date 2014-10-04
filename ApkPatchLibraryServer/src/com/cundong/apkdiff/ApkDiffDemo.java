@@ -3,6 +3,13 @@ package com.cundong.apkdiff;
 import com.cundong.common.Constants;
 import com.cundong.utils.DiffUtils;
 
+/**
+ * 类说明：  apk包，查分实例
+ * 
+ * @author  Cundong
+ * @date    2014-9-6
+ * @version 1.0
+ */
 public class ApkDiffDemo {
 
 	public static void main(String[] args) {

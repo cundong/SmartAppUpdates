@@ -59,7 +59,7 @@ static off_t offtin(u_char *buf)
 	return y;
 }
 
-int gennewapk(int argc,char * argv[])
+int applypatch(int argc,char * argv[])
 {
 	FILE * f, * cpf, * dpf, * epf;
 	BZFILE * cpfbz2, * dpfbz2, * epfbz2;
@@ -218,7 +218,7 @@ JNIEXPORT jint JNICALL Java_com_cundong_utils_PatchUtils_patch
 	argv[2] = (char*) ((*env)->GetStringUTFChars(env, new, 0));
 	argv[3] = (char*) ((*env)->GetStringUTFChars(env, patch, 0));
 
-	int ret = gennewapk(argc, argv);
+	int ret = applypatch(argc, argv);
 
 	(*env)->ReleaseStringUTFChars(env, old, argv[1]);
 	(*env)->ReleaseStringUTFChars(env, new, argv[2]);

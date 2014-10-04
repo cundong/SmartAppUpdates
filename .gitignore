@@ -1,11 +1,7 @@
+gen/*
+bin/*
+obj/*
 *.class
 
-gen/*
-
-bin/*
-
-obj/*
-
-Debug/*
-
-Release/*
+ApkPatchLibraryServer/Debug/*
+ApkPatchLibraryServer/Release/*

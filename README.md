@@ -1,4 +1,4 @@
-# Android App增量更新库（Smart App Updates）
+# Android应用增量更新库（Smart App Updates）
 
 ------
 
@@ -144,7 +144,7 @@ public class PatchUtils {
 需要在手机客户端实现，ApkPatchLibrary工程封装了这个过程。
 
 #### 2.1 C部分
-ApkPatchLibrary/jni/bzip2目录中所有文件都来自bzip2项目
+ApkPatchLibrary/jni/bzip2目录中所有文件都来自bzip2项目。
 
 ApkPatchLibrary/jni/com_cundong_utils_PatchUtils.c、ApkPatchLibrary/jni/com_cundong_utils_PatchUtils.c实现文件的合并过程，其中com_cundong_utils_PatchUtils.c修改自bsdiff/bspatch.c。
 
@@ -202,9 +202,10 @@ public class PatchUtils {
 > 
 4.TestApk：用于测试的，旧版本的微博客户端，以及使用ApkPatchLibraryServer生成的新旧新浪微博差分包；
 
-## Blog
+## 关于我
 
-[http://my.oschina.net/liucundong/blog][4]
+* Blog: [http://my.oschina.net/liucundong/blog][4]
+* Mail: cundong.liu#gmail.com
 
 ## Update
 

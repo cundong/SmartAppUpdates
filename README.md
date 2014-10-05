@@ -22,15 +22,13 @@ Link： [http://developer.android.com/about/versions/jelly-bean.html][1]
 
 例如，当前手机中已安装微博V1，大小为12.8MB，现在微博发布了最新版V2，大小为15.4MB，我们对两个版本的apk文件查分比对之后，发现差异只有3M，那么用户就只需要要下载一个3M的差分包，使用旧版apk与这个差分包，合成得到一个新版本apk，提醒用户安装即可，不需要整包下载15.4M的微博V2版apk。
 
-以新浪微博客户端的升级为例，假设手机上安装的是V4.5.0，现在最新版是V4.5.5，用户需要从V4.5.0升级到V4.5.5。 
-
 apk文件的差分、合成，可以通过开源的二进制比较工具bsdiff来实现(Link：[http://www.daemonology.net/bsdiff/][2])
 
 因为bsdiff依赖bzip2，所以我们还需要用到bzip2（Link：[http://www.bzip.org/downloads.html][3]）
 
 bsdiff中，bsdiff.c用于生成查分包，bspatch.c用于合成文件。 
 
-接下来，我们分开来说，我们需要做3件事。
+接下来，我们分开说，需要做3件事。
 
 1.在服务器端，生成这两个版本微博的差分包； 
 
@@ -51,9 +49,9 @@ bsdiff中，bsdiff.c用于生成查分包，bspatch.c用于合成文件。
  2. V2.0 ——> V4.0的差分包；
  3. V3.0 ——> V4.0的差分包；
 
-ApkPatchLibraryServer 工程即为Java语言实现的服务器端查分程序。
+ApkPatchLibraryServer工程即为Java语言实现的服务器端查分程序。
 
-下面对 ApkPatchLibraryServer 做一些简单说明：
+下面对ApkPatchLibraryServer做一些简单说明：
 
 #### 1.1 C部分
 
@@ -196,7 +194,7 @@ public class PatchUtils {
 > 
 2.ApkPatchLibrary：客户端使用的apk合成库；
 > 
-3.ApkPatchLibraryDemo：引用ApkPatchLibrary Library，实现增量更新的Demo；
+3.ApkPatchLibraryDemo：引用ApkPatchLibrary Library 的Demo，以新浪微博客户端的升级为例，假设手机上安装的是V4.5.0，最新版是V4.5.5，用户需要从V4.5.0升级到V4.5.5。 
 > 
 4.TestApk：用于测试的，旧版本的微博客户端，以及使用ApkPatchLibraryServer生成的新旧新浪微博差分包；
 

@@ -1,10 +1,10 @@
 package com.cundong.utils;
 
 /**
- * 类说明： APK工具类
+ * 类说明： 	apk diff 工具类
  * 
- * @author Cundong
- * @date 2013-9-6
+ * @author 	Cundong
+ * @date 	2013-9-6
  * @version 1.0
  */
 public class DiffUtils {

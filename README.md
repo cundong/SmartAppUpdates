@@ -1,8 +1,14 @@
-# Android App 增量更新实例（Smart App Updates）
+# Android App增量更新库（Smart App Updates）
 
 ------
 
 ## 介绍
+
+你所看到的，是一个用于Android应用程序增量更新的开源库。
+
+包括客户端、服务端两部分代码。
+
+## 原理
 
 自从 Android 4.1 开始，Google引入了应用程序的增量更新。 
 
@@ -15,8 +21,6 @@ Link： [http://developer.android.com/about/versions/jelly-bean.html][1]
 > save the device’s battery, and conserve bandwidth usage on users’
 > mobile data plan. On average, a smart app update is about 1/3 the
 > sizeof a full APK update.
-
-## 原理
 
 增量更新的原理非常简单，就是将手机上已安装apk与服务器端最新apk进行二进制对比，并得到差分包，用户更新程序时，只需要下载差分包，并在本地使用差分包与已安装apk，合成新版apk。
 

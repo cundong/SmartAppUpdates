@@ -38,7 +38,7 @@ bsdiff中，bsdiff.c用于生成查分包，bspatch.c用于合成文件。
 
 ## 过程分析
 
-### 1.生成差分包
+### 1 生成差分包
 
 这一步需要在服务器端来实现，一般来说，每当apk有新版本需要提示用户升级，都需要运营人员在后台管理端上传新apk，上传时就应该由程序生成之前所有旧版本们与最新版的差分包。 
 
@@ -80,7 +80,7 @@ ApkPatchLibraryServer/jni 中，除了以下4个：
 
 Build成功后，将该动态链接库文件，加入环境变量，供Java语言调用。
 
-#### 1.2.Java部分
+#### 1.2 Java部分
 
 com.cundong.utils包，为调用C语言的Java实现；
 com.cundong.apkdiff包，为apk查分程序的Demo；
@@ -139,14 +139,14 @@ public class PatchUtils {
 
 需要在手机客户端实现，ApkPatchLibrary工程封装了这个过程。
 
-#### 2.1.C部分
+#### 2.1 C部分
 ApkPatchLibrary/jni/bzip2目录中所有文件都来自bzip2项目
 
 ApkPatchLibrary/jni/com_cundong_utils_PatchUtils.c、ApkPatchLibrary/jni/com_cundong_utils_PatchUtils.c实现文件的合并过程，其中com_cundong_utils_PatchUtils.c修改自bsdiff/bspatch.c。
 
 我们需要用NDK编译出一个libApkPatchLibrary.so文件，生成的so文件位于libs/armeabi/ 下，其他 Android 工程便可以使用该libApkPatchLibrary.so文件来合成apk。
 
-#### 2.2.Java部分
+#### 2.2 Java部分
 
 com.cundong.utils包，为调用C语言的Java实现；
 

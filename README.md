@@ -84,6 +84,28 @@ ApkPatchLibraryServer/jni 中，除了以下4个：
 
 Build成功后，将该动态链接库文件，加入环境变量，供Java语言调用。
 
+com_cundong_utils_DiffUtils.c中Java_com_cundong_utils_DiffUtils_genDiff()方法，即为生成差分包的代码：
+
+```C
+
+JNIEXPORT jint JNICALL Java_com_cundong_utils_DiffUtils_genDiff(JNIEnv *env, jclass cls,
+		jstring old, jstring new, jstring patch) {
+	int argc = 4;
+	char * argv[argc];
+	argv[0] = "bsdiff";
+	argv[1] = (char*) ((*env)->GetStringUTFChars(env, old, 0));
+	argv[2] = (char*) ((*env)->GetStringUTFChars(env, new, 0));
+	argv[3] = (char*) ((*env)->GetStringUTFChars(env, patch, 0));
+
+	int ret = genpatch(argc, argv);
+
+	(*env)->ReleaseStringUTFChars(env, old, argv[1]);
+	(*env)->ReleaseStringUTFChars(env, new, argv[2]);
+	(*env)->ReleaseStringUTFChars(env, patch, argv[3]);
+	return ret;
+}
+```
+
 #### 1.2 Java部分
 
 com.cundong.utils包，为调用C语言的Java实现；
@@ -149,6 +171,27 @@ ApkPatchLibrary/jni/bzip2目录中所有文件都来自bzip2项目。
 ApkPatchLibrary/jni/com_cundong_utils_PatchUtils.c、ApkPatchLibrary/jni/com_cundong_utils_PatchUtils.c实现文件的合并过程，其中com_cundong_utils_PatchUtils.c修改自bsdiff/bspatch.c。
 
 我们需要用NDK编译出一个libApkPatchLibrary.so文件，生成的so文件位于libs/armeabi/ 下，其他 Android 工程便可以使用该libApkPatchLibrary.so文件来合成apk。
+
+com_cundong_utils_PatchUtils.Java_com_cundong_utils_PatchUtils_patch()方法，即为生成差分包的代码：
+
+```C
+JNIEXPORT jint JNICALL Java_com_cundong_utils_PatchUtils_patch(JNIEnv *env,
+		jobject obj, jstring old, jstring new, jstring patch) {
+	char * ch[4];
+	ch[0] = "bspatch";
+	ch[1] = (char*) ((*env)->GetStringUTFChars(env, old, 0));
+	ch[2] = (char*) ((*env)->GetStringUTFChars(env, new, 0));
+	ch[3] = (char*) ((*env)->GetStringUTFChars(env, patch, 0));
+
+	int ret = applypatch(4, ch);
+	(*env)->ReleaseStringUTFChars(env, old, ch[1]);
+	(*env)->ReleaseStringUTFChars(env, new, ch[2]);
+	(*env)->ReleaseStringUTFChars(env, patch, ch[3]);
+
+	//return (*env)->NewStringUTF(env,"success");
+	return ret;
+}
+```
 
 #### 2.2 Java部分
 

@@ -236,14 +236,15 @@ public class PatchUtils {
 
 源码中，包含以下文件： 
 
-> 
-1.ApkPatchLibraryServer：Java语言实现的，服务器端生成差分包工程；
-> 
-2.ApkPatchLibrary：客户端使用的apk合成库；
-> 
-3.ApkPatchLibraryDemo：引用ApkPatchLibrary Library 的Demo，以新浪微博客户端的升级为例，假设手机上安装的是V4.5.0，最新版是V4.5.5，用户需要从V4.5.0升级到V4.5.5。 
-> 
-4.TestApk：用于测试的，旧版本的微博客户端，以及使用ApkPatchLibraryServer生成的新旧新浪微博差分包；
+* 1.ApkPatchLibraryServer：Java语言实现的，服务器端生成差分包工程；
+
+* 2.ApkPatchLibrary：客户端使用的apk合成库；
+
+* 3.ApkPatchLibraryDemo：一个Demo，需要引用ApkPatchLibrary Library，以新浪微博客户端的升级为例，假设手机上安装的是V4.5.0，最新版是V4.5.5，用户需要从V4.5.0升级到V4.5.5。 
+
+* 4.ApkPatchLibraryDemo2：另一个Demo，不需要引用ApkPatchLibrary Library，直接将ApkPatchLibrary构建得到的 libApkPatchLibrary.so 文件拷贝到了 libs/armeabi 目录。
+
+* 5.TestApk：用于测试的，旧版本的微博客户端，以及使用ApkPatchLibraryServer生成的新旧新浪微博差分包；
 
 ## 关于我
 

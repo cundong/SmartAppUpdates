@@ -20,6 +20,7 @@ import android.widget.Toast;
 import com.cundong.utils.PatchUtils;
 import com.example.test.util.ApkUtils;
 import com.example.test.util.SignUtils;
+import com.example.test2.R;
 
 /**
  * 类说明：	ApkPatchLibrary使用Demo

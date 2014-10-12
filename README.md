@@ -34,11 +34,11 @@ bsdiff中，bsdiff.c用于生成查分包，bspatch.c用于合成文件。
 
 接下来，我们分开说，需要做3件事。
 
-1.在服务器端，生成这两个版本微博的差分包； 
+* 在服务器端，生成这两个版本微博的差分包； 
 
-2.在手机客户端，使用已安装的旧版apk与这个差分包，合成为一个新版微博apk； 
+* 在手机客户端，使用已安装的旧版apk与这个差分包，合成为一个新版微博apk； 
 
-3.校验新合成的微博客户端文件是否完成，签名时候和已安装客户端一致，如一致，提示用户安装；
+* 校验新合成的微博客户端文件是否完整，签名时候和已安装客户端一致，如一致，提示用户安装；
 
 ## 过程分析
 
@@ -236,15 +236,15 @@ public class PatchUtils {
 
 源码中，包含以下文件： 
 
-* 1.ApkPatchLibraryServer：Java语言实现的，服务器端生成差分包工程；
+* ApkPatchLibraryServer：Java语言实现的，服务器端生成差分包工程；
 
-* 2.ApkPatchLibrary：客户端使用的apk合成库；
+* ApkPatchLibrary：客户端使用的apk合成库；
 
-* 3.ApkPatchLibraryDemo：一个Demo，需要引用ApkPatchLibrary Library，以新浪微博客户端的升级为例，假设手机上安装的是V4.5.0，最新版是V4.5.5，用户需要从V4.5.0升级到V4.5.5。 
+* ApkPatchLibraryDemo：一个Demo，需要引用ApkPatchLibrary Library，以新浪微博客户端的升级为例，假设手机上安装的是V4.5.0，最新版是V4.5.5，用户需要从V4.5.0升级到V4.5.5。 
 
-* 4.ApkPatchLibraryDemo2：另一个Demo，不需要引用ApkPatchLibrary Library，直接将ApkPatchLibrary构建得到的 libApkPatchLibrary.so 文件拷贝到了 libs/armeabi 目录。
+* ApkPatchLibraryDemo2：另一个Demo，不需要引用ApkPatchLibrary Library，直接将ApkPatchLibrary构建得到的 libApkPatchLibrary.so 文件拷贝到了 libs/armeabi 目录。
 
-* 5.TestApk：用于测试的，旧版本的微博客户端，以及使用ApkPatchLibraryServer生成的新旧新浪微博差分包；
+* TestApk：用于测试的旧版本微博客户端V4.5.0，以及使用ApkPatchLibraryServer生成的新旧新浪微博差分包；
 
 ## 关于我
 
@@ -259,6 +259,7 @@ public class PatchUtils {
 
 3.修改ReadMe.md，更加清晰的说明开源库的使用，同时进一步重构代码。（2014年，10月4日晚）
 
+4.新增一个ApkPatchLibraryDemo2，无需引用ApkPatchLibrary Library。
 
 ## License
 

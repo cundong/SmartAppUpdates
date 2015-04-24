@@ -1,10 +1,10 @@
-# Android应用增量更新库（Smart App Updates）
+# Android应用增量更新 - Smart App Updates
 
 ------
 
 ## 介绍
 
-你所看到的，是一个用于Android应用程序增量更新的开源库。
+你所看到的，是一个用于Android应用程序增量更新的库。
 
 包括客户端、服务端两部分代码。
 

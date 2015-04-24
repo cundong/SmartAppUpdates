@@ -265,10 +265,12 @@ public class PatchUtils {
 
 * ApkPatchLibraryDemo2：另一个Demo（不需要引用ApkPatchLibrary Library），直接将ApkPatchLibrary构建得到的 libApkPatchLibrary.so 文件拷贝到了 libs/armeabi 目录，实现微博客户端的增量更新。
 
-ApkPatchLibraryDemo工程和ApkPatchLibraryDemo2工程中用到的V4.5.0版微博，V4.5.5版微博，以及两个版本微博的差分包，可以通过以下链接下载：
+ApkPatchLibraryDemo、ApkPatchLibraryDemo2 中用到的V4.5.0版微博，V4.5.5版微博，以及两个版本微博的差分包，可以通过以下链接下载：
 
-* 旧版本微博V4.5.0.apk: [download][5]
-* 新版微博weiboV4.5.5.apk: [download][6]
+* 旧版本微博V4.5.0: [download][5]
+
+* 新版微博weiboV4.5.5: [download][6]
+
 * 使用ApkPatchLibraryServer生成的新旧新浪微博差分包: [download][7]
 
 ## 关于我

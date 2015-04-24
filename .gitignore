@@ -1,7 +1,13 @@
 gen/*
 bin/*
 obj/*
-*.class
 
+ApkPatchLibraryDemo/bin/*
+ApkPatchLibraryDemo/gen/*
+
+ApkPatchLibraryDemo2/bin/*
+ApkPatchLibraryDemo2/gen/*
+
+ApkPatchLibraryServer/bin/*
 ApkPatchLibraryServer/Debug/*
 ApkPatchLibraryServer/Release/*

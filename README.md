@@ -24,13 +24,13 @@ Link： [http://developer.android.com/about/versions/jelly-bean.html][1]
 
 增量更新的原理非常简单，就是将手机上已安装apk与服务器端最新apk进行二进制对比，并得到差分包，用户更新程序时，只需要下载差分包，并在本地使用差分包与已安装apk，合成新版apk。
 
-例如，当前手机中已安装微博V1，大小为12.8MB，现在微博发布了最新版V2，大小为15.4MB，我们对两个版本的apk文件查分比对之后，发现差异只有3M，那么用户就只需要要下载一个3M的差分包，使用旧版apk与这个差分包，合成得到一个新版本apk，提醒用户安装即可，不需要整包下载15.4M的微博V2版apk。
+例如，当前手机中已安装微博V1，大小为12.8MB，现在微博发布了最新版V2，大小为15.4MB，我们对两个版本的apk文件差分比对之后，发现差异只有3M，那么用户就只需要要下载一个3M的差分包，使用旧版apk与这个差分包，合成得到一个新版本apk，提醒用户安装即可，不需要整包下载15.4M的微博V2版apk。
 
 apk文件的差分、合成，可以通过开源的二进制比较工具bsdiff来实现(Link：[http://www.daemonology.net/bsdiff/][2])
 
 因为bsdiff依赖bzip2，所以我们还需要用到bzip2（Link：[http://www.bzip.org/downloads.html][3]）
 
-bsdiff中，bsdiff.c用于生成查分包，bspatch.c用于合成文件。 
+bsdiff中，bsdiff.c用于生成差分包，bspatch.c用于合成文件。 
 
 接下来，我们分开说，需要做3件事。
 
@@ -53,7 +53,7 @@ bsdiff中，bsdiff.c用于生成查分包，bspatch.c用于合成文件。
  2. V2.0 ——> V4.0的差分包；
  3. V3.0 ——> V4.0的差分包；
 
-ApkPatchLibraryServer工程即为Java语言实现的服务器端查分程序。
+ApkPatchLibraryServer工程即为Java语言实现的服务器端差分程序。
 
 下面对ApkPatchLibraryServer做一些简单说明：
 
@@ -66,7 +66,7 @@ ApkPatchLibraryServer/jni 中，除了以下4个：
 >com_cundong_utils_PatchUtils.c
 >com_cundong_utils_PatchUtils.h
 
-全部来自bzip。
+jni/bzip2目录中的文件，全部来自bzip2项目。
 
 >com_cundong_utils_DiffUtils.c
 >com_cundong_utils_DiffUtils.h
@@ -78,13 +78,13 @@ ApkPatchLibraryServer/jni 中，除了以下4个：
 
 用于合成新apk文件。
 
-其中，com_cundong_utils_DiffUtils.c修改自 bsdiff/bsdiff.c，com_cundong_utils_PatchUtils.c修改自bsdiff/bspatch.c。
+com_cundong_utils_DiffUtils.c修改自 bsdiff/bsdiff.c，com_cundong_utils_PatchUtils.c修改自bsdiff/bspatch.c。
 
 我们在需要将jni中的C文件，build输出为动态链接库，以供Java调用（Window环境下生成的文件名为libApkPatchLibraryServer.dll，Unix-like系统下为libApkPatchLibraryServer.so，OSX下为libApkPatchLibraryServer.dylib）。
 
 Build成功后，将该动态链接库文件，加入环境变量，供Java语言调用。
 
-com_cundong_utils_DiffUtils.c中Java_com_cundong_utils_DiffUtils_genDiff()方法，即为生成差分包的代码：
+com_cundong_utils_DiffUtils.c 中 Java_com_cundong_utils_DiffUtils_genDiff() 方法，用于生成差分包的：
 
 ```C
 
@@ -105,11 +105,32 @@ JNIEXPORT jint JNICALL Java_com_cundong_utils_DiffUtils_genDiff(JNIEnv *env, jcl
 	return ret;
 }
 ```
+com_cundong_utils_PatchUtils.c 中 Java_com_cundong_utils_PatchUtils_patch() 方法，用于合成新的APK；
+
+```C
+JNIEXPORT jint JNICALL Java_com_cundong_utils_PatchUtils_patch
+  (JNIEnv *env, jclass cls,
+			jstring old, jstring new, jstring patch){
+	int argc = 4;
+	char * argv[argc];
+	argv[0] = "bspatch";
+	argv[1] = (char*) ((*env)->GetStringUTFChars(env, old, 0));
+	argv[2] = (char*) ((*env)->GetStringUTFChars(env, new, 0));
+	argv[3] = (char*) ((*env)->GetStringUTFChars(env, patch, 0));
+
+	int ret = applypatch(argc, argv);
+
+	(*env)->ReleaseStringUTFChars(env, old, argv[1]);
+	(*env)->ReleaseStringUTFChars(env, new, argv[2]);
+	(*env)->ReleaseStringUTFChars(env, patch, argv[3]);
+	return ret;
+}
+```
 
 #### 1.2 Java部分
 
 com.cundong.utils包，为调用C语言的Java实现；
-com.cundong.apkdiff包，为apk查分程序的Demo；
+com.cundong.apkdiff包，为apk差分程序的Demo；
 com.cundong.apkpatch包，为apk合并程序的Demo；
 
 调用，com.cundong.utils.DiffUtils中genDiff()方法，可以通过传入的新旧apk路径，得到差分包。 
@@ -166,7 +187,7 @@ public class PatchUtils {
 需要在手机客户端实现，ApkPatchLibrary工程封装了这个过程。
 
 #### 2.1 C部分
-ApkPatchLibrary/jni/bzip2目录中所有文件都来自bzip2项目。
+同ApkPatchLibraryServer工程一样，ApkPatchLibrary/jni/bzip2 目录中所有文件都来自bzip2项目。
 
 ApkPatchLibrary/jni/com_cundong_utils_PatchUtils.c、ApkPatchLibrary/jni/com_cundong_utils_PatchUtils.c实现文件的合并过程，其中com_cundong_utils_PatchUtils.c修改自bsdiff/bspatch.c。
 
@@ -261,9 +282,11 @@ public class PatchUtils {
 
 4.新增一个ApkPatchLibraryDemo2，无需引用ApkPatchLibrary Library。
 
+5.调整ApkPatchLibraryServer工程目录。（2015年，4月24日)
+
 ## License
 
-    Copyright 2014 Cundong
+    Copyright 2015 Cundong
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.

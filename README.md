@@ -255,17 +255,21 @@ public class PatchUtils {
 
 ## 一些说明
 
-源码中，包含以下文件： 
+各目录说明如下： 
 
-* ApkPatchLibraryServer：Java语言实现的，服务器端生成差分包工程；
+* ApkPatchLibraryServer：服务器端生成差分包工程，使用Java实现；
 
-* ApkPatchLibrary：客户端使用的apk合成库；
+* ApkPatchLibrary：客户端使用的apk合成库，用于生成libApkPatchLibrary.so；
 
-* ApkPatchLibraryDemo：一个Demo，需要引用ApkPatchLibrary Library，以新浪微博客户端的升级为例，假设手机上安装的是V4.5.0，最新版是V4.5.5，用户需要从V4.5.0升级到V4.5.5。 
+* ApkPatchLibraryDemo：一个Demo（需要引用ApkPatchLibrary Library），以新浪微博客户端的升级为例，手机上安装了V4.5.0，通过只下载查分包，增量更新至V4.5.5。 
 
-* ApkPatchLibraryDemo2：另一个Demo，不需要引用ApkPatchLibrary Library，直接将ApkPatchLibrary构建得到的 libApkPatchLibrary.so 文件拷贝到了 libs/armeabi 目录。
+* ApkPatchLibraryDemo2：另一个Demo（不需要引用ApkPatchLibrary Library），直接将ApkPatchLibrary构建得到的 libApkPatchLibrary.so 文件拷贝到了 libs/armeabi 目录，实现微博客户端的增量更新。
 
-* TestApk：用于测试的旧版本微博客户端V4.5.0，以及使用ApkPatchLibraryServer生成的新旧新浪微博差分包；
+ApkPatchLibraryDemo工程和ApkPatchLibraryDemo2工程中用到的V4.5.0版微博，V4.5.5版微博，以及两个版本微博的差分包，可以通过以下链接下载：
+
+* 旧版本微博V4.5.0.apk: [download][5]
+* 新版微博weiboV4.5.5.apk: [download][6]
+* 使用ApkPatchLibraryServer生成的新旧新浪微博差分包: [download][7]
 
 ## 关于我
 
@@ -304,3 +308,6 @@ public class PatchUtils {
   [2]: http://www.daemonology.net/bsdiff/
   [3]: http://www.bzip.org/downloads.html
   [4]: http://my.oschina.net/liucundong/blog
+  [5]: http://pan.baidu.com/s/1hqs1vaG
+  [6]: http://pan.baidu.com/s/1i3tLo6T
+  [7]: http://pan.baidu.com/s/1o6BSaoy

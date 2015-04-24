@@ -198,6 +198,7 @@ int applypatch(int argc, char * argv[]) {
 */
 JNIEXPORT jint JNICALL Java_com_cundong_utils_PatchUtils_patch(JNIEnv *env,
 		jobject obj, jstring old, jstring new, jstring patch) {
+
 	char * ch[4];
 	ch[0] = "bspatch";
 	ch[1] = (char*) ((*env)->GetStringUTFChars(env, old, 0));

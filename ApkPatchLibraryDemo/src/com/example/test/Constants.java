@@ -4,6 +4,13 @@ import java.io.File;
 
 import android.os.Environment;
 
+/**
+ * 类说明：  常量类
+ * 
+ * @author 	Cundong
+ * @date 	2013-9-6
+ * @version 1.0
+ */
 public class Constants {
 
 	//用于测试的packageName
@@ -11,9 +18,6 @@ public class Constants {
 	
 	public static final String PATH = Environment.getExternalStorageDirectory() + File.separator;
 
-	//旧版本微博客户端的目录
-	public static final String OLD_APK_PATH = PATH + "weiboV4.5.0.apk";
-	
 	//合成得到的新版微博
 	public static final String NEW_APK_PATH = PATH + "weiboOldtoNew.apk";
 	

@@ -9,8 +9,11 @@ import android.net.Uri;
 import android.text.TextUtils;
 
 /**
- * apk 工具类
+ * 类说明：  Apk工具类
  * 
+ * @author 	Cundong
+ * @date 	2013-9-6
+ * @version 1.0
  */
 public class ApkUtils {
 
@@ -27,12 +30,21 @@ public class ApkUtils {
 		return installed;
 	}
 
+	/**
+	 * 获取已安装Apk文件的源Apk文件
+	 * 如：/data/app/com.sina.weibo-1.apk
+	 * 
+	 * @param context
+	 * @param packageName
+	 * @return
+	 */
 	public static String getSourceApkPath(Context context, String packageName) {
 		if (TextUtils.isEmpty(packageName))
 			return null;
 
 		try {
-			ApplicationInfo appInfo = context.getPackageManager().getApplicationInfo(packageName, 0);
+			ApplicationInfo appInfo = context.getPackageManager()
+					.getApplicationInfo(packageName, 0);
 			return appInfo.sourceDir;
 		} catch (NameNotFoundException e) {
 			e.printStackTrace();
@@ -42,7 +54,7 @@ public class ApkUtils {
 	}
 
 	/**
-	 * 安装APK
+	 * 安装Apk
 	 * 
 	 * @param context
 	 * @param apkPath

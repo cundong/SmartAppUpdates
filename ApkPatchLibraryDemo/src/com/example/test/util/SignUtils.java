@@ -14,8 +14,11 @@ import android.content.pm.Signature;
 import android.util.DisplayMetrics;
 
 /**
- * apk 签名工具类
+ * 类说明：  apk 签名信息获取工具类
  * 
+ * @author 	Cundong
+ * @date 	2013-9-6
+ * @version 1.0
  */
 public class SignUtils {
 
@@ -27,10 +30,8 @@ public class SignUtils {
 	 */
 	public static String getUnInstalledApkSignature(String apkPath) {
 		String PATH_PackageParser = "android.content.pm.PackageParser";
+
 		try {
-			// apk包的文件路径
-			// 这是一个Package 解释器, 是隐藏的
-			// 构造函数的参数只有一个, apk文件的路径
 			Class<?> pkgParserCls = Class.forName(PATH_PackageParser);
 			Class<?>[] typeArgs = new Class[1];
 			typeArgs[0] = String.class;
@@ -39,17 +40,15 @@ public class SignUtils {
 			valueArgs[0] = apkPath;
 			Object pkgParser = pkgParserCt.newInstance(valueArgs);
 
-			// 这个是与显示有关的, 里面涉及到一些像素显示等等, 我们使用默认的情况
 			DisplayMetrics metrics = new DisplayMetrics();
 			metrics.setToDefaults();
-			// PackageParser.Package mPkgInfo = packageParser.parsePackage(new
-			// File(apkPath), apkPath,
-			// metrics, 0);
+
 			typeArgs = new Class[4];
 			typeArgs[0] = File.class;
 			typeArgs[1] = String.class;
 			typeArgs[2] = DisplayMetrics.class;
 			typeArgs[3] = Integer.TYPE;
+
 			Method pkgParser_parsePackageMtd = pkgParserCls.getDeclaredMethod(
 					"parsePackage", typeArgs);
 			valueArgs = new Object[4];
@@ -63,13 +62,14 @@ public class SignUtils {
 			typeArgs = new Class[2];
 			typeArgs[0] = pkgParserPkg.getClass();
 			typeArgs[1] = Integer.TYPE;
+
 			Method pkgParser_collectCertificatesMtd = pkgParserCls
 					.getDeclaredMethod("collectCertificates", typeArgs);
 			valueArgs = new Object[2];
 			valueArgs[0] = pkgParserPkg;
 			valueArgs[1] = PackageManager.GET_SIGNATURES;
 			pkgParser_collectCertificatesMtd.invoke(pkgParser, valueArgs);
-			// 应用程序信息包, 这个公开的, 不过有些函数, 变量没公开
+
 			Field packageInfoFld = pkgParserPkg.getClass().getDeclaredField(
 					"mSignatures");
 			Signature[] info = (Signature[]) packageInfoFld.get(pkgParserPkg);
@@ -88,7 +88,7 @@ public class SignUtils {
 	 * @param packageName
 	 * @return
 	 */
-	public static String InstalledApkSignature(Context context,
+	public static String getInstalledApkSignature(Context context,
 			String packageName) {
 		PackageManager pm = context.getPackageManager();
 		List<PackageInfo> apps = pm

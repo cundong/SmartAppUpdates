@@ -66,7 +66,7 @@ ApkPatchLibraryServer/jni 中，除了以下4个：
 >com_cundong_utils_PatchUtils.c
 >com_cundong_utils_PatchUtils.h
 
-全部来自bzip。
+jni/bzip2目录中的文件，全部来自bzip2项目。
 
 >com_cundong_utils_DiffUtils.c
 >com_cundong_utils_DiffUtils.h
@@ -78,13 +78,13 @@ ApkPatchLibraryServer/jni 中，除了以下4个：
 
 用于合成新apk文件。
 
-其中，com_cundong_utils_DiffUtils.c修改自 bsdiff/bsdiff.c，com_cundong_utils_PatchUtils.c修改自bsdiff/bspatch.c。
+com_cundong_utils_DiffUtils.c修改自 bsdiff/bsdiff.c，com_cundong_utils_PatchUtils.c修改自bsdiff/bspatch.c。
 
 我们在需要将jni中的C文件，build输出为动态链接库，以供Java调用（Window环境下生成的文件名为libApkPatchLibraryServer.dll，Unix-like系统下为libApkPatchLibraryServer.so，OSX下为libApkPatchLibraryServer.dylib）。
 
 Build成功后，将该动态链接库文件，加入环境变量，供Java语言调用。
 
-com_cundong_utils_DiffUtils.c中Java_com_cundong_utils_DiffUtils_genDiff()方法，即为生成差分包的代码：
+com_cundong_utils_DiffUtils.c 中 Java_com_cundong_utils_DiffUtils_genDiff() 方法，用于生成差分包的：
 
 ```C
 
@@ -105,11 +105,32 @@ JNIEXPORT jint JNICALL Java_com_cundong_utils_DiffUtils_genDiff(JNIEnv *env, jcl
 	return ret;
 }
 ```
+com_cundong_utils_PatchUtils.c 中 Java_com_cundong_utils_PatchUtils_patch() 方法，用于合成新的APK；
+
+```C
+JNIEXPORT jint JNICALL Java_com_cundong_utils_PatchUtils_patch
+  (JNIEnv *env, jclass cls,
+			jstring old, jstring new, jstring patch){
+	int argc = 4;
+	char * argv[argc];
+	argv[0] = "bspatch";
+	argv[1] = (char*) ((*env)->GetStringUTFChars(env, old, 0));
+	argv[2] = (char*) ((*env)->GetStringUTFChars(env, new, 0));
+	argv[3] = (char*) ((*env)->GetStringUTFChars(env, patch, 0));
+
+	int ret = applypatch(argc, argv);
+
+	(*env)->ReleaseStringUTFChars(env, old, argv[1]);
+	(*env)->ReleaseStringUTFChars(env, new, argv[2]);
+	(*env)->ReleaseStringUTFChars(env, patch, argv[3]);
+	return ret;
+}
+```
 
 #### 1.2 Java部分
 
 com.cundong.utils包，为调用C语言的Java实现；
-com.cundong.apkdiff包，为apk查分程序的Demo；
+com.cundong.apkdiff包，为apk差分程序的Demo；
 com.cundong.apkpatch包，为apk合并程序的Demo；
 
 调用，com.cundong.utils.DiffUtils中genDiff()方法，可以通过传入的新旧apk路径，得到差分包。 
@@ -166,7 +187,7 @@ public class PatchUtils {
 需要在手机客户端实现，ApkPatchLibrary工程封装了这个过程。
 
 #### 2.1 C部分
-ApkPatchLibrary/jni/bzip2目录中所有文件都来自bzip2项目。
+同ApkPatchLibraryServer工程一样，ApkPatchLibrary/jni/bzip2 目录中所有文件都来自bzip2项目。
 
 ApkPatchLibrary/jni/com_cundong_utils_PatchUtils.c、ApkPatchLibrary/jni/com_cundong_utils_PatchUtils.c实现文件的合并过程，其中com_cundong_utils_PatchUtils.c修改自bsdiff/bspatch.c。
 
@@ -263,7 +284,7 @@ public class PatchUtils {
 
 ## License
 
-    Copyright 2014 Cundong
+    Copyright 2015 Cundong
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.

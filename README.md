@@ -282,6 +282,8 @@ public class PatchUtils {
 
 4.新增一个ApkPatchLibraryDemo2，无需引用ApkPatchLibrary Library。
 
+5.调整ApkPatchLibraryServer工程目录。（2015年，4月24日)
+
 ## License
 
     Copyright 2015 Cundong

@@ -1,16 +1,16 @@
-# Android应用增量更新库（Smart App Updates）
+# Android应用增量更新 - Smart App Updates
 
 ------
 
 ## 介绍
 
-你所看到的，是一个用于Android应用程序增量更新的开源库。
+你所看到的，是一个用于Android应用程序增量更新的库。
 
 包括客户端、服务端两部分代码。
 
 ## 原理
 
-自从 Android 4.1 开始，Google引入了应用程序的增量更新。 
+自从 Android 4.1 开始， Google Play 引入了应用程序的增量更新功能，根据官方的估计，使用该升级方式，大约可以节省2/3的流量。
 
 Link： [http://developer.android.com/about/versions/jelly-bean.html][1]
 > Smart app updates is a new feature of Google Play that introduces a
@@ -251,7 +251,7 @@ public class PatchUtils {
 
 增量更新的前提条件，是在手机客户端能让我们读取到当前应用程序安装后的源apk，如果获取不到源apk，那么就无法进行增量更新了。
 
-另外，如果你的应用程序不是很大，比如只有2、3M，那么完全没有必要使用增量更新，增量更新适用于apk包比较大的情况，比如游戏客户端。
+另外，如果你的应用程序不是很大，比如只有2、3M，那么完全没有必要使用增量更新，增量更新只适用于apk包比较大的情况，比如手机游戏客户端。
 
 ## 一些说明
 
@@ -261,14 +261,16 @@ public class PatchUtils {
 
 * ApkPatchLibrary：客户端使用的apk合成库，用于生成libApkPatchLibrary.so；
 
-* ApkPatchLibraryDemo：一个Demo（需要引用ApkPatchLibrary Library），以新浪微博客户端的升级为例，手机上安装了V4.5.0，通过只下载查分包，增量更新至V4.5.5。 
+* ApkPatchLibraryDemo：一个Demo（需要引用ApkPatchLibrary Library），以新浪微博客户端的升级为例，手机上安装了V4.5.0，通过只下载差分包，增量更新至V4.5.5。 
 
 * ApkPatchLibraryDemo2：另一个Demo（不需要引用ApkPatchLibrary Library），直接将ApkPatchLibrary构建得到的 libApkPatchLibrary.so 文件拷贝到了 libs/armeabi 目录，实现微博客户端的增量更新。
 
-ApkPatchLibraryDemo工程和ApkPatchLibraryDemo2工程中用到的V4.5.0版微博，V4.5.5版微博，以及两个版本微博的差分包，可以通过以下链接下载：
+ApkPatchLibraryDemo、ApkPatchLibraryDemo2 中用到的V4.5.0版微博，V4.5.5版微博，以及两个版本微博的差分包，可以通过以下链接下载：
 
-* 旧版本微博V4.5.0.apk: [download][5]
-* 新版微博weiboV4.5.5.apk: [download][6]
+* 旧版本微博V4.5.0: [download][5]
+
+* 新版微博weiboV4.5.5: [download][6]
+
 * 使用ApkPatchLibraryServer生成的新旧新浪微博差分包: [download][7]
 
 ## 关于我

@@ -251,7 +251,7 @@ public class PatchUtils {
 
 增量更新的前提条件，是在手机客户端能让我们读取到当前应用程序安装后的源apk，如果获取不到源apk，那么就无法进行增量更新了。
 
-另外，如果你的应用程序不是很大，比如只有2、3M，那么完全没有必要使用增量更新，增量更新适用于apk包比较大的情况，比如游戏客户端。
+另外，如果你的应用程序不是很大，比如只有2、3M，那么完全没有必要使用增量更新，增量更新只适用于apk包比较大的情况，比如手机游戏客户端。
 
 ## 一些说明
 
@@ -261,7 +261,7 @@ public class PatchUtils {
 
 * ApkPatchLibrary：客户端使用的apk合成库，用于生成libApkPatchLibrary.so；
 
-* ApkPatchLibraryDemo：一个Demo（需要引用ApkPatchLibrary Library），以新浪微博客户端的升级为例，手机上安装了V4.5.0，通过只下载查分包，增量更新至V4.5.5。 
+* ApkPatchLibraryDemo：一个Demo（需要引用ApkPatchLibrary Library），以新浪微博客户端的升级为例，手机上安装了V4.5.0，通过只下载差分包，增量更新至V4.5.5。 
 
 * ApkPatchLibraryDemo2：另一个Demo（不需要引用ApkPatchLibrary Library），直接将ApkPatchLibrary构建得到的 libApkPatchLibrary.so 文件拷贝到了 libs/armeabi 目录，实现微博客户端的增量更新。
 

@@ -2,68 +2,39 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center_horizontal"
     android:orientation="vertical" >
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/textview0"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="5dip" >
+        android:lineSpacingMultiplier="1.5"
+        android:text="@string/demo_info0" />
 
-        <TextView
-            android:id="@+id/textview0"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:lineSpacingMultiplier="1.5"
-            android:text="@string/demo_info0"
-            android:textSize="14sp" />
-    </LinearLayout>
-    
-    <LinearLayout
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/textview1"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="5dip" >
+        android:autoLink="web"
+        android:lineSpacingMultiplier="1.5"
+        android:text="@string/demo_info1" />
 
-        <TextView
-            android:id="@+id/textview1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:lineSpacingMultiplier="1.5"
-            android:text="@string/demo_info1"
-            android:textSize="14sp" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/textview2"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="5dip" >
+        android:autoLink="web"
+        android:lineSpacingMultiplier="1.5"
+        android:text="@string/demo_info2"
+        android:textSize="14sp" />
 
-        <TextView
-            android:id="@+id/textview2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:lineSpacingMultiplier="1.5"
-            android:text="@string/demo_info2"
-            android:textSize="14sp" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/textview3"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="5dip" >
-
-        <TextView
-            android:id="@+id/textview3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:lineSpacingMultiplier="1.5"
-            android:text="@string/demo_info3"
-            android:textSize="14sp" />
-    </LinearLayout>
+        android:lineSpacingMultiplier="1.5"
+        android:text="@string/demo_info3"
+        android:textSize="14sp" />
 
     <Button
         android:id="@+id/start_btn"
@@ -76,14 +47,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/demo_github" />
-
-    <ProgressBar
-        android:id="@+id/progressView1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:indeterminate="false"
-        android:visibility="gone" />
 
     <TextView
         android:id="@+id/textview4"

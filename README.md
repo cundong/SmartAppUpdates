@@ -290,7 +290,7 @@ ApkPatchLibraryDemo、ApkPatchLibraryDemo2 中用到的V4.5.0版微博，V4.5.5�
 
 5.调整ApkPatchLibraryServer工程目录。（2015年，4月24日)
 
-6.上传一个演示demo（[download][8]）。（2015-4-26）
+6.上传一个演示demo（[ApkPatchLibraryDemo.apk][8]）。（2015-4-26）
 
 ## License
 

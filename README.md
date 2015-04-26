@@ -290,6 +290,8 @@ ApkPatchLibraryDemo、ApkPatchLibraryDemo2 中用到的V4.5.0版微博，V4.5.5�
 
 5.调整ApkPatchLibraryServer工程目录。（2015年，4月24日)
 
+6.上传一个演示demo（[download][8]）。（2015-4-26）
+
 ## License
 
     Copyright 2015 Cundong
@@ -313,3 +315,4 @@ ApkPatchLibraryDemo、ApkPatchLibraryDemo2 中用到的V4.5.0版微博，V4.5.5�
   [5]: http://pan.baidu.com/s/1hqs1vaG
   [6]: http://pan.baidu.com/s/1i3tLo6T
   [7]: http://pan.baidu.com/s/1o6BSaoy
+  [8]: https://github.com/cundong/SmartAppUpdates/blob/master/ApkPatchLibraryDemo.apk

@@ -195,7 +195,7 @@ int applypatch(int argc, char * argv[]) {
  * Class:     com_cundong_utils_PatchUtils
  * Method:    patch
  * Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)I
-*/
+ */
 JNIEXPORT jint JNICALL Java_com_cundong_utils_PatchUtils_patch(JNIEnv *env,
 		jobject obj, jstring old, jstring new, jstring patch) {
 
@@ -205,11 +205,17 @@ JNIEXPORT jint JNICALL Java_com_cundong_utils_PatchUtils_patch(JNIEnv *env,
 	ch[2] = (char*) ((*env)->GetStringUTFChars(env, new, 0));
 	ch[3] = (char*) ((*env)->GetStringUTFChars(env, patch, 0));
 
+	__android_log_print(ANDROID_LOG_INFO, "ApkPatchLibrary", "old = %s ", ch[1]);
+	__android_log_print(ANDROID_LOG_INFO, "ApkPatchLibrary", "new = %s ", ch[2]);
+	__android_log_print(ANDROID_LOG_INFO, "ApkPatchLibrary", "patch = %s ", ch[3]);
+
 	int ret = applypatch(4, ch);
+
+	__android_log_print(ANDROID_LOG_INFO, "ApkPatchLibrary", "applypatch result = %d ", ret);
+
 	(*env)->ReleaseStringUTFChars(env, old, ch[1]);
 	(*env)->ReleaseStringUTFChars(env, new, ch[2]);
 	(*env)->ReleaseStringUTFChars(env, patch, ch[3]);
 
-	//return (*env)->NewStringUTF(env,"success");
 	return ret;
 }

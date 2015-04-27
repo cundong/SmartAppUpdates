@@ -10,7 +10,7 @@
 
 ## 原理
 
-自从 Android 4.1 开始， Google Play 引入了应用程序的增量更新功能，根据官方的估计，使用该升级方式，大约可以节省2/3的流量。
+自从 Android 4.1 开始， Google Play 引入了应用程序的增量更新功能，App使用该升级方式，可节省约2/3的流量。
 
 Link： [http://developer.android.com/about/versions/jelly-bean.html][1]
 > Smart app updates is a new feature of Google Play that introduces a

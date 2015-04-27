@@ -22,6 +22,8 @@ Link： [http://developer.android.com/about/versions/jelly-bean.html][1]
 > mobile data plan. On average, a smart app update is about 1/3 the
 > sizeof a full APK update.
 
+现在国内主流的应用市场也都支持应用的增量更新了。
+
 增量更新的原理非常简单，就是将手机上已安装apk与服务器端最新apk进行二进制对比，并得到差分包，用户更新程序时，只需要下载差分包，并在本地使用差分包与已安装apk，合成新版apk。
 
 例如，当前手机中已安装微博V1，大小为12.8MB，现在微博发布了最新版V2，大小为15.4MB，我们对两个版本的apk文件差分比对之后，发现差异只有3M，那么用户就只需要要下载一个3M的差分包，使用旧版apk与这个差分包，合成得到一个新版本apk，提醒用户安装即可，不需要整包下载15.4M的微博V2版apk。

@@ -28,7 +28,6 @@
 __FBSDID("$FreeBSD: src/usr.bin/bsdiff/bsdiff/bsdiff.c,v 1.1 2005/08/06 01:59:05 cperciva Exp $");
 #endif
 
-
 #include <sys/types.h>
 
 #include <bzlib.h>
@@ -268,14 +267,12 @@ int genpatch(int argc, char *argv[]) {
 	 that we never try to malloc(0) and get a NULL pointer */
 	if (((fd = open(argv[1], O_RDONLY, 0)) < 0)
 			|| ((oldsize = lseek(fd, 0, SEEK_END)) == -1)
-			|| ((old = malloc(oldsize + 1)) == NULL)
+			|| ((old = malloc(oldsize + 1)) == NULL )
 			|| (lseek(fd, 0, SEEK_SET) != 0)
-			|| (read(fd, old, oldsize) != oldsize) || (close(fd) == -1))
-		err(1, "%s", argv[1]);
+			|| (read(fd, old, oldsize) != oldsize) || (close(fd) == -1))err(1, "%s", argv[1]);
 
-	if (((I = malloc((oldsize + 1) * sizeof(off_t))) == NULL)
-			|| ((V = malloc((oldsize + 1) * sizeof(off_t))) == NULL))
-		err(1, NULL);
+	if (((I = malloc((oldsize + 1) * sizeof(off_t))) == NULL )
+	|| ((V = malloc((oldsize + 1) * sizeof(off_t))) == NULL))err(1, NULL);
 
 	qsufsort(I, V, old, oldsize);
 
@@ -285,19 +282,17 @@ int genpatch(int argc, char *argv[]) {
 	 that we never try to malloc(0) and get a NULL pointer */
 	if (((fd = open(argv[2], O_RDONLY, 0)) < 0)
 			|| ((newsize = lseek(fd, 0, SEEK_END)) == -1)
-			|| ((new = malloc(newsize + 1)) == NULL)
+			|| ((new = malloc(newsize + 1)) == NULL )
 			|| (lseek(fd, 0, SEEK_SET) != 0)
-			|| (read(fd, new, newsize) != newsize) || (close(fd) == -1))
-		err(1, "%s", argv[2]);
+			|| (read(fd, new, newsize) != newsize) || (close(fd) == -1))err(1, "%s", argv[2]);
 
-	if (((db = malloc(newsize + 1)) == NULL)
-			|| ((eb = malloc(newsize + 1)) == NULL))
-		err(1, NULL);
+	if (((db = malloc(newsize + 1)) == NULL )
+	|| ((eb = malloc(newsize + 1)) == NULL))err(1, NULL);
 	dblen = 0;
 	eblen = 0;
 
 	/* Create the patch file */
-	if ((pf = fopen(argv[3], "w")) == NULL)
+	if ((pf = fopen(argv[3], "w")) == NULL )
 		err(1, "%s", argv[3]);
 
 	/* Header is
@@ -318,7 +313,7 @@ int genpatch(int argc, char *argv[]) {
 		err(1, "fwrite(%s)", argv[3]);
 
 	/* Compute the differences, writing ctrl as we go */
-	if ((pfbz2 = BZ2_bzWriteOpen(&bz2err, pf, 9, 0, 0)) == NULL)
+	if ((pfbz2 = BZ2_bzWriteOpen(&bz2err, pf, 9, 0, 0)) == NULL )
 		errx(1, "BZ2_bzWriteOpen, bz2err = %d", bz2err);
 	scan = 0;
 	len = 0;
@@ -422,7 +417,7 @@ int genpatch(int argc, char *argv[]) {
 			lastoffset = pos - scan;
 		};
 	};
-	BZ2_bzWriteClose(&bz2err, pfbz2, 0, NULL, NULL);
+	BZ2_bzWriteClose(&bz2err, pfbz2, 0, NULL, NULL );
 	if (bz2err != BZ_OK)
 		errx(1, "BZ2_bzWriteClose, bz2err = %d", bz2err);
 
@@ -432,12 +427,12 @@ int genpatch(int argc, char *argv[]) {
 	offtout(len - 32, header + 8);
 
 	/* Write compressed diff data */
-	if ((pfbz2 = BZ2_bzWriteOpen(&bz2err, pf, 9, 0, 0)) == NULL)
+	if ((pfbz2 = BZ2_bzWriteOpen(&bz2err, pf, 9, 0, 0)) == NULL )
 		errx(1, "BZ2_bzWriteOpen, bz2err = %d", bz2err);
 	BZ2_bzWrite(&bz2err, pfbz2, db, dblen);
 	if (bz2err != BZ_OK)
 		errx(1, "BZ2_bzWrite, bz2err = %d", bz2err);
-	BZ2_bzWriteClose(&bz2err, pfbz2, 0, NULL, NULL);
+	BZ2_bzWriteClose(&bz2err, pfbz2, 0, NULL, NULL );
 	if (bz2err != BZ_OK)
 		errx(1, "BZ2_bzWriteClose, bz2err = %d", bz2err);
 
@@ -447,12 +442,12 @@ int genpatch(int argc, char *argv[]) {
 	offtout(newsize - len, header + 16);
 
 	/* Write compressed extra data */
-	if ((pfbz2 = BZ2_bzWriteOpen(&bz2err, pf, 9, 0, 0)) == NULL)
+	if ((pfbz2 = BZ2_bzWriteOpen(&bz2err, pf, 9, 0, 0)) == NULL )
 		errx(1, "BZ2_bzWriteOpen, bz2err = %d", bz2err);
 	BZ2_bzWrite(&bz2err, pfbz2, eb, eblen);
 	if (bz2err != BZ_OK)
 		errx(1, "BZ2_bzWrite, bz2err = %d", bz2err);
-	BZ2_bzWriteClose(&bz2err, pfbz2, 0, NULL, NULL);
+	BZ2_bzWriteClose(&bz2err, pfbz2, 0, NULL, NULL );
 	if (bz2err != BZ_OK)
 		errx(1, "BZ2_bzWriteClose, bz2err = %d", bz2err);
 
@@ -474,8 +469,8 @@ int genpatch(int argc, char *argv[]) {
 	return 0;
 }
 
-JNIEXPORT jint JNICALL Java_com_cundong_utils_DiffUtils_genDiff(JNIEnv *env, jclass cls,
-		jstring old, jstring new, jstring patch) {
+JNIEXPORT jint JNICALL Java_com_cundong_utils_DiffUtils_genDiff(JNIEnv *env,
+		jclass cls, jstring old, jstring new, jstring patch) {
 	int argc = 4;
 	char * argv[argc];
 	argv[0] = "bsdiff";
@@ -483,10 +478,17 @@ JNIEXPORT jint JNICALL Java_com_cundong_utils_DiffUtils_genDiff(JNIEnv *env, jcl
 	argv[2] = (char*) ((*env)->GetStringUTFChars(env, new, 0));
 	argv[3] = (char*) ((*env)->GetStringUTFChars(env, patch, 0));
 
+	printf("old apk = %s \n", argv[1]);
+	printf("new apk = %s \n", argv[2]);
+	printf("patch = %s \n", argv[3]);
+
 	int ret = genpatch(argc, argv);
+
+	printf("genDiff result = %d ", ret);
 
 	(*env)->ReleaseStringUTFChars(env, old, argv[1]);
 	(*env)->ReleaseStringUTFChars(env, new, argv[2]);
 	(*env)->ReleaseStringUTFChars(env, patch, argv[3]);
+
 	return ret;
 }

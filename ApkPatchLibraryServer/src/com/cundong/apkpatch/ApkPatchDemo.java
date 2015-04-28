@@ -8,7 +8,7 @@ import com.cundong.utils.PatchUtils;
  * 
  * @author  Cundong
  * @date    2014-9-6
- * @version 1.0
+ * @version 1.2
  */
 public class ApkPatchDemo {
 

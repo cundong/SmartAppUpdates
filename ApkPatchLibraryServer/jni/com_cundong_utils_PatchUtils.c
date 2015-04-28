@@ -218,7 +218,13 @@ JNIEXPORT jint JNICALL Java_com_cundong_utils_PatchUtils_patch
 	argv[2] = (char*) ((*env)->GetStringUTFChars(env, new, 0));
 	argv[3] = (char*) ((*env)->GetStringUTFChars(env, patch, 0));
 
+	printf("old apk = %s \n", argv[1]);
+	printf("patch = %s \n", argv[3]);
+	printf("new apk = %s \n", argv[2]);
+
 	int ret = applypatch(argc, argv);
+
+	printf("patch result = %d ", ret);
 
 	(*env)->ReleaseStringUTFChars(env, old, argv[1]);
 	(*env)->ReleaseStringUTFChars(env, new, argv[2]);

@@ -4,11 +4,11 @@ import com.cundong.common.Constants;
 import com.cundong.utils.DiffUtils;
 
 /**
- * 类说明：  apk包，差分实例
+ * 类说明：  新旧apk包，生成差分包实例
  * 
  * @author  Cundong
  * @date    2014-9-6
- * @version 1.0
+ * @version 1.2
  */
 public class ApkDiffDemo {
 

@@ -163,20 +163,22 @@ public class DiffUtils {
 
 ```java
 /**
- * 类说明：   APK Patch工具类
+ * 类说明： 	APK Patch工具类
  * 
- * @author  Cundong
- * @date    2013-9-6
+ * @author 	Cundong
+ * @date 	2013-9-6
  * @version 1.0
  */
 public class PatchUtils {
 
 	/**
-	 * native方法
-	 * 使用路径为oldApkPath的apk与路径为patchPath的补丁包，合成新的apk，并存储于newApkPath
-	 * @param oldApkPath
-	 * @param newApkPath
-	 * @param patchPath
+	 * native方法 使用路径为oldApkPath的apk与路径为patchPath的补丁包，合成新的apk，并存储于newApkPath
+	 * 
+	 * 返回：0，说明操作成功
+	 * 
+	 * @param oldApkPath 示例:/sdcard/old.apk
+	 * @param newApkPath 示例:/sdcard/new.apk
+	 * @param patchPath  示例:/sdcard/xx.patch
 	 * @return
 	 */
 	public static native int patch(String oldApkPath, String newApkPath,
@@ -198,20 +200,32 @@ ApkPatchLibrary/jni/com_cundong_utils_PatchUtils.c、ApkPatchLibrary/jni/com_cun
 com_cundong_utils_PatchUtils.Java_com_cundong_utils_PatchUtils_patch()方法，即为生成差分包的代码：
 
 ```C
+/*
+ * Class:     com_cundong_utils_PatchUtils
+ * Method:    patch
+ * Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)I
+ */
 JNIEXPORT jint JNICALL Java_com_cundong_utils_PatchUtils_patch(JNIEnv *env,
 		jobject obj, jstring old, jstring new, jstring patch) {
+
 	char * ch[4];
 	ch[0] = "bspatch";
 	ch[1] = (char*) ((*env)->GetStringUTFChars(env, old, 0));
 	ch[2] = (char*) ((*env)->GetStringUTFChars(env, new, 0));
 	ch[3] = (char*) ((*env)->GetStringUTFChars(env, patch, 0));
 
+	__android_log_print(ANDROID_LOG_INFO, "ApkPatchLibrary", "old = %s ", ch[1]);
+	__android_log_print(ANDROID_LOG_INFO, "ApkPatchLibrary", "new = %s ", ch[2]);
+	__android_log_print(ANDROID_LOG_INFO, "ApkPatchLibrary", "patch = %s ", ch[3]);
+
 	int ret = applypatch(4, ch);
+
+	__android_log_print(ANDROID_LOG_INFO, "ApkPatchLibrary", "applypatch result = %d ", ret);
+
 	(*env)->ReleaseStringUTFChars(env, old, ch[1]);
 	(*env)->ReleaseStringUTFChars(env, new, ch[2]);
 	(*env)->ReleaseStringUTFChars(env, patch, ch[3]);
 
-	//return (*env)->NewStringUTF(env,"success");
 	return ret;
 }
 ```
@@ -224,20 +238,22 @@ com.cundong.utils包，为调用C语言的Java实现；
 
 ```java
 /**
- * 类说明：   APK Patch工具类
+ * 类说明： 	APK Patch工具类
  * 
- * @author  Cundong
- * @date    2013-9-6
+ * @author 	Cundong
+ * @date 	2013-9-6
  * @version 1.0
  */
 public class PatchUtils {
 
 	/**
-	 * native方法
-	 * 使用路径为oldApkPath的apk与路径为patchPath的补丁包，合成新的apk，并存储于newApkPath
-	 * @param oldApkPath
-	 * @param newApkPath
-	 * @param patchPath
+	 * native方法 使用路径为oldApkPath的apk与路径为patchPath的补丁包，合成新的apk，并存储于     newApkPath
+	 * 
+	 * 返回：0，说明操作成功
+	 * 
+	 * @param oldApkPath 示例:/sdcard/old.apk
+	 * @param newApkPath 示例:/sdcard/new.apk
+	 * @param patchPath  示例:/sdcard/xx.patch
 	 * @return
 	 */
 	public static native int patch(String oldApkPath, String newApkPath,

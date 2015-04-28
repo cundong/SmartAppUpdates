@@ -10,9 +10,8 @@
 
 ## 原理
 
-自从 Android 4.1 开始， Google Play 引入了应用程序的增量更新功能，App使用该升级方式，可节省约2/3的流量。
+自从 Android 4.1 开始， [Google Play 引入了应用程序的增量更新功能][1]，App使用该升级方式，可节省约2/3的流量。
 
-Link： [http://developer.android.com/about/versions/jelly-bean.html][1]
 > Smart app updates is a new feature of Google Play that introduces a
 > better way of delivering app updates to devices. When developers
 > publish an update, Google Play now delivers only the bits that have
@@ -28,9 +27,9 @@ Link： [http://developer.android.com/about/versions/jelly-bean.html][1]
 
 例如，当前手机中已安装微博V1，大小为12.8MB，现在微博发布了最新版V2，大小为15.4MB，我们对两个版本的apk文件差分比对之后，发现差异只有3M，那么用户就只需要要下载一个3M的差分包，使用旧版apk与这个差分包，合成得到一个新版本apk，提醒用户安装即可，不需要整包下载15.4M的微博V2版apk。
 
-apk文件的差分、合成，可以通过开源的二进制比较工具bsdiff来实现(Link：[http://www.daemonology.net/bsdiff/][2])
+apk文件的差分、合成，可以通过开源的二进制比较工具 [bsdiff][2] 来实现
 
-因为bsdiff依赖bzip2，所以我们还需要用到bzip2（Link：[http://www.bzip.org/downloads.html][3]）
+因为bsdiff依赖bzip2，所以我们还需要用到 [bzip2][3]
 
 bsdiff中，bsdiff.c用于生成差分包，bspatch.c用于合成文件。 
 
@@ -64,18 +63,23 @@ ApkPatchLibraryServer工程即为Java语言实现的服务器端差分程序。
 ApkPatchLibraryServer/jni 中，除了以下4个：
 
 >com_cundong_utils_DiffUtils.c
+
 >com_cundong_utils_DiffUtils.h
+
 >com_cundong_utils_PatchUtils.c
+
 >com_cundong_utils_PatchUtils.h
 
 jni/bzip2目录中的文件，全部来自bzip2项目。
 
 >com_cundong_utils_DiffUtils.c
+
 >com_cundong_utils_DiffUtils.h
 
 用于生成差分包。
 
 >com_cundong_utils_PatchUtils.c
+
 >com_cundong_utils_PatchUtils.h
 
 用于合成新apk文件。
@@ -89,6 +93,7 @@ Build成功后，将该动态链接库文件，加入环境变量，供Java语�
 com_cundong_utils_DiffUtils.c 中 Java_com_cundong_utils_DiffUtils_genDiff() 方法，用于生成差分包的：
 
 ```C
+
 JNIEXPORT jint JNICALL Java_com_cundong_utils_DiffUtils_genDiff(JNIEnv *env,
 		jclass cls, jstring old, jstring new, jstring patch) {
 	int argc = 4;
@@ -112,6 +117,7 @@ JNIEXPORT jint JNICALL Java_com_cundong_utils_DiffUtils_genDiff(JNIEnv *env,
 
 	return ret;
 }
+
 ```
 com_cundong_utils_PatchUtils.c 中 Java_com_cundong_utils_PatchUtils_patch() 方法，用于合成新的APK；
 
@@ -299,11 +305,11 @@ public class PatchUtils {
 
 ApkPatchLibraryDemo、ApkPatchLibraryDemo2 中用到的V4.5.0版微博，V4.5.5版微博，以及两个版本微博的差分包，可以通过以下链接下载：
 
-* 旧版本微博V4.5.0: [download][5]
+* [旧版本微博V4.5.0][5]
 
-* 新版微博weiboV4.5.5: [download][6]
+* [新版微博weiboV4.5.5][6]
 
-* 使用ApkPatchLibraryServer生成的新旧新浪微博差分包: [download][7]
+* [使用ApkPatchLibraryServer生成的新旧新浪微博差分包][7]
 
 ## 关于我
 
@@ -322,7 +328,7 @@ ApkPatchLibraryDemo、ApkPatchLibraryDemo2 中用到的V4.5.0版微博，V4.5.5�
 
 5.调整ApkPatchLibraryServer工程目录。（2015年，4月24日)
 
-6.上传一个演示demo（[ApkPatchLibraryDemo.apk][8]）。（2015-4-26）
+6.上传一个演示demo [ApkPatchLibraryDemo.apk][8]。（2015-4-26）
 
 ## License
 

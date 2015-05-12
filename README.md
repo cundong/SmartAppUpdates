@@ -27,7 +27,7 @@
 
 例如，当前手机中已安装微博V1，大小为12.8MB，现在微博发布了最新版V2，大小为15.4MB，我们对两个版本的apk文件差分比对之后，发现差异只有3M，那么用户就只需要要下载一个3M的差分包，使用旧版apk与这个差分包，合成得到一个新版本apk，提醒用户安装即可，不需要整包下载15.4M的微博V2版apk。
 
-apk文件的差分、合成，可以通过[开源的二进制比较工具 bsdiff][2] 来实现
+apk文件的差分、合成，可以通过 [开源的二进制比较工具 bsdiff][2] 来实现
 
 因为bsdiff依赖bzip2，所以我们还需要用到 [bzip2][3]
 
@@ -84,7 +84,7 @@ jni/bzip2目录中的文件，全部来自bzip2项目。
 
 用于合成新apk文件。
 
-com_cundong_utils_DiffUtils.c修改自 `bsdiff/bsdiff.c`，`com_cundong_utils_PatchUtils.c`修改自`bsdiff/bspatch.c`。
+`com_cundong_utils_DiffUtils.c` 修改自 `bsdiff/bsdiff.c`，`com_cundong_utils_PatchUtils.c`修改自`bsdiff/bspatch.c`。
 
 我们在需要将jni中的C文件，build输出为动态链接库，以供Java调用（Window环境下生成的文件名为libApkPatchLibraryServer.dll，Unix-like系统下为libApkPatchLibraryServer.so，OSX下为libApkPatchLibraryServer.dylib）。
 

@@ -27,11 +27,11 @@
 
 例如，当前手机中已安装微博V1，大小为12.8MB，现在微博发布了最新版V2，大小为15.4MB，我们对两个版本的apk文件差分比对之后，发现差异只有3M，那么用户就只需要要下载一个3M的差分包，使用旧版apk与这个差分包，合成得到一个新版本apk，提醒用户安装即可，不需要整包下载15.4M的微博V2版apk。
 
-apk文件的差分、合成，可以通过开源的二进制比较工具 [bsdiff][2] 来实现
+apk文件的差分、合成，可以通过[开源的二进制比较工具 bsdiff][2] 来实现
 
 因为bsdiff依赖bzip2，所以我们还需要用到 [bzip2][3]
 
-bsdiff中，bsdiff.c用于生成差分包，bspatch.c用于合成文件。 
+bsdiff中，`bsdiff.c`用于生成差分包，`bspatch.c`用于合成文件。 
 
 接下来，我们分开说，需要做3件事。
 
@@ -328,7 +328,7 @@ ApkPatchLibraryDemo、ApkPatchLibraryDemo2 中用到的V4.5.0版微博，V4.5.5�
 
 5.调整ApkPatchLibraryServer工程目录。（2015年，4月24日)
 
-6.上传一个演示demo [ApkPatchLibraryDemo.apk][8]。（2015-4-26）
+6.上传[一个演示demo ApkPatchLibraryDemo.apk][8]。（2015-4-26）
 
 ## License
 

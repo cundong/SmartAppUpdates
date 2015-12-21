@@ -283,7 +283,7 @@ public class PatchUtils {
 
 ### 3.校验新合成的apk文件
 
-新包和成之后，还需要对客户端合成的apk包与最新版本apk包进行MD5或SHA1校验，如果校验码不一致，说明合成过程有问题，新合成的包将不能被安装。
+在执行patch之前，需要先读取本地安装旧版本APK的MD5或SHA1，判断当前安装的文件是否为合法版本，同样，patch得到新包之后，也需要对它进行MD5或SHA1校验，校验失败，说明合成过程有问题。
 
 ## 注意事项
 
@@ -299,9 +299,9 @@ public class PatchUtils {
 
 * ApkPatchLibrary：客户端使用的apk合成库，用于生成libApkPatchLibrary.so，使用Eclipse开发；
 
-* ApkPatchLibrarySample：一个Sample，手机上安装[Weibo5.5.apk][5]，[Weibo5.6.apk][5]，使用AndroidStudio开发。 
+* ApkPatchLibrarySample：一个Sample，手机上安装 Weibo5.5.apk，通过与SD卡上预先存放的weibo.patch文件进行合并，实现升级过程，使用AndroidStudio开发。 
 
-另外，我把 ApkPatchLibraryDemo、ApkPatchLibraryDemo2 中用到的[Weibo5.5.apk][5]，[Weibo5.6.apk][5]，以及 [使用ApkPatchLibraryServer生成的差分包(Weibo5.5.apk->Weibo5.6.apk)][5]，都通过云盘共享了。
+另外，我把 ApkPatchLibraryDemo、ApkPatchLibraryDemo2 中用到的Weibo5.5.apk，Weibo5.6.apk，以及使用ApkPatchLibraryServer生成的差分包(Weibo5.5.apk->Weibo5.6.apk)， [都通过云盘共享了][5]。
 
 ## 关于我
 

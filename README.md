@@ -303,13 +303,7 @@ public class PatchUtils {
 
 * ApkPatchLibraryDemo2：另一个Demo（不需要引用ApkPatchLibrary Library），直接将ApkPatchLibrary构建得到的 libApkPatchLibrary.so 文件拷贝到了 libs/armeabi 目录，实现微博客户端的增量更新。
 
-ApkPatchLibraryDemo、ApkPatchLibraryDemo2 中用到的Weibo5.5.apk，Weibo5.6.apk，以及Weibo5.5.apk->Weibo5.6.apk的差分包weibo.patchh，可以通过以下链接下载：
-
-* [Weibo5.5.apk][5]
-
-* [Weibo5.6.apk][5]
-
-* [使用ApkPatchLibraryServer生成的差分包(Weibo5.5.apk->Weibo5.6.apk)][5]
+另外，我把 ApkPatchLibraryDemo、ApkPatchLibraryDemo2 中用到的[Weibo5.5.apk][5]，[Weibo5.6.apk][5]，以及 [使用ApkPatchLibraryServer生成的差分包(Weibo5.5.apk->Weibo5.6.apk)][5]，都通过云盘共享了。
 
 ## 关于我
 

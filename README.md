@@ -301,7 +301,7 @@ public class PatchUtils {
 
 * ApkPatchLibrarySample：一个Sample，手机上安装 Weibo5.5.apk，通过与SD卡上预先存放的weibo.patch文件进行合并，实现升级过程，使用AndroidStudio开发。 
 
-另外，我把 ApkPatchLibraryDemo、ApkPatchLibraryDemo2 中用到的Weibo5.5.apk，Weibo5.6.apk，以及使用ApkPatchLibraryServer生成的差分包(Weibo5.5.apk->Weibo5.6.apk)， [都通过云盘共享了][5]。
+另外，我把 ApkPatchLibraryServer、ApkPatchLibrarySample 中用到的Weibo5.5.apk，Weibo5.6.apk，以及使用ApkPatchLibraryServer生成的差分包(Weibo5.5.apk->Weibo5.6.apk)， [都通过云盘共享了][5]。
 
 ## 关于我
 
@@ -320,7 +320,7 @@ public class PatchUtils {
 
 5.上传[一个演示demo ApkPatchLibrarySample.apk][6]。（2015-4-26）
 
-6.ApkPatchLibrarySample重新使用AndroidStudio开发，修改文件MD5的对比逻辑；
+6.ApkPatchLibrarySample重新使用AndroidStudio开发，修改文件MD5的对比逻辑。
 
 ## License
 

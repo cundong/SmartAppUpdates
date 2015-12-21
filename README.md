@@ -297,11 +297,9 @@ public class PatchUtils {
 
 * ApkPatchLibraryServer：服务器端生成差分包工程，使用Java实现；
 
-* ApkPatchLibrary：客户端使用的apk合成库，用于生成libApkPatchLibrary.so；
+* ApkPatchLibrary：客户端使用的apk合成库，用于生成libApkPatchLibrary.so，使用Eclipse开发；
 
-* ApkPatchLibraryDemo：一个Demo（需要引用ApkPatchLibrary Library），以新浪微博客户端的升级为例，手机上安装了V5.5，通过只下载差分包，增量更新至V5.6。 
-
-* ApkPatchLibraryDemo2：另一个Demo（不需要引用ApkPatchLibrary Library），直接将ApkPatchLibrary构建得到的 libApkPatchLibrary.so 文件拷贝到了 libs/armeabi 目录，实现微博客户端的增量更新。
+* ApkPatchLibrarySample：一个Sample，手机上安装[Weibo5.5.apk][5]，[Weibo5.6.apk][5]，使用AndroidStudio开发。 
 
 另外，我把 ApkPatchLibraryDemo、ApkPatchLibraryDemo2 中用到的[Weibo5.5.apk][5]，[Weibo5.6.apk][5]，以及 [使用ApkPatchLibraryServer生成的差分包(Weibo5.5.apk->Weibo5.6.apk)][5]，都通过云盘共享了。
 
@@ -318,11 +316,11 @@ public class PatchUtils {
 
 3.修改ReadMe.md，更加清晰的说明开源库的使用，同时进一步重构代码。（2014年，10月4日晚）
 
-4.新增一个ApkPatchLibraryDemo2，无需引用ApkPatchLibrary Library。
+4.调整ApkPatchLibraryServer工程目录。（2015年，4月24日)
 
-5.调整ApkPatchLibraryServer工程目录。（2015年，4月24日)
+5.上传[一个演示demo ApkPatchLibrarySample.apk][6]。（2015-4-26）
 
-6.上传[一个演示demo ApkPatchLibraryDemo.apk][6]。（2015-4-26）
+6.ApkPatchLibrarySample重新使用AndroidStudio开发，修改文件MD5的对比逻辑；
 
 ## License
 
@@ -345,4 +343,4 @@ public class PatchUtils {
   [3]: http://www.bzip.org/downloads.html
   [4]: http://my.oschina.net/liucundong/blog
   [5]: http://pan.baidu.com/s/1T5Szc#path=%252FSmartAppUpdates
-  [6]: https://github.com/cundong/SmartAppUpdates/blob/master/ApkPatchLibraryDemo.apk
+  [6]: https://github.com/cundong/SmartAppUpdates/blob/master/ApkPatchLibrarySample.apk

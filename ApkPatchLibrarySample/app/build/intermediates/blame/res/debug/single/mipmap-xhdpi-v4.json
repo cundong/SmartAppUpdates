@@ -1,0 +1,10 @@
+[
+    {
+        "merged": "E:\\ApkPatchLibrarySample\\app\\build\\intermediates\\res\\merged\\debug\\mipmap-xhdpi-v4\\ic_launcher.png",
+        "source": "E:\\ApkPatchLibrarySample\\app\\src\\main\\res\\mipmap-xhdpi\\ic_launcher.png"
+    },
+    {
+        "merged": "E:\\ApkPatchLibraryDemo2\\app\\build\\intermediates\\res\\merged\\debug\\mipmap-xhdpi-v4\\ic_launcher.png",
+        "source": "E:\\ApkPatchLibraryDemo2\\app\\src\\main\\res\\mipmap-xhdpi\\ic_launcher.png"
+    }
+]

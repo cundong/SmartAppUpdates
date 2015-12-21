@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">ApkPatchSample</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="demo_info1">1.请先安装旧版微博V5.5</string>
+    <string name="demo_info2">2.将由服务器端生成的差分文件weibo.patch（V5.5->V5.6）拷贝至：/sdcard/weibo.patch</string>
+    <string name="demo_info3">3.点击“Start”</string>
+    <string name="demo_start">Start</string>
+    <string name="demo_github">GitHub</string>
+</resources>

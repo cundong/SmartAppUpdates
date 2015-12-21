@@ -1,0 +1,10 @@
+[
+    {
+        "merged": "E:\\ApkPatchLibrarySample\\app\\build\\intermediates\\res\\merged\\debug\\menu\\menu_main.xml",
+        "source": "E:\\ApkPatchLibrarySample\\app\\src\\main\\res\\menu\\menu_main.xml"
+    },
+    {
+        "merged": "E:\\ApkPatchLibraryDemo2\\app\\build\\intermediates\\res\\merged\\debug\\menu\\menu_main.xml",
+        "source": "E:\\ApkPatchLibraryDemo2\\app\\src\\main\\res\\menu\\menu_main.xml"
+    }
+]

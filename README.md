@@ -299,17 +299,17 @@ public class PatchUtils {
 
 * ApkPatchLibrary：客户端使用的apk合成库，用于生成libApkPatchLibrary.so；
 
-* ApkPatchLibraryDemo：一个Demo（需要引用ApkPatchLibrary Library），以新浪微博客户端的升级为例，手机上安装了V4.5.0，通过只下载差分包，增量更新至V4.5.5。 
+* ApkPatchLibraryDemo：一个Demo（需要引用ApkPatchLibrary Library），以新浪微博客户端的升级为例，手机上安装了V5.5，通过只下载差分包，增量更新至V5.6。 
 
 * ApkPatchLibraryDemo2：另一个Demo（不需要引用ApkPatchLibrary Library），直接将ApkPatchLibrary构建得到的 libApkPatchLibrary.so 文件拷贝到了 libs/armeabi 目录，实现微博客户端的增量更新。
 
-ApkPatchLibraryDemo、ApkPatchLibraryDemo2 中用到的V4.5.0版微博，V4.5.5版微博，以及两个版本微博的差分包，可以通过以下链接下载：
+ApkPatchLibraryDemo、ApkPatchLibraryDemo2 中用到的Weibo5.5.apk，Weibo5.6.apk，以及Weibo5.5.apk->Weibo5.6.apk的差分包weibo.patchh，可以通过以下链接下载：
 
-* [旧版本微博V4.5.0][5]
+* [Weibo5.5.apk][5]
 
-* [新版微博weiboV4.5.5][6]
+* [Weibo5.6.apk][5]
 
-* [使用ApkPatchLibraryServer生成的新旧新浪微博差分包][7]
+* [使用ApkPatchLibraryServer生成的差分包(Weibo5.5.apk->Weibo5.6.apk)][5]
 
 ## 关于我
 
@@ -328,7 +328,7 @@ ApkPatchLibraryDemo、ApkPatchLibraryDemo2 中用到的V4.5.0版微博，V4.5.5�
 
 5.调整ApkPatchLibraryServer工程目录。（2015年，4月24日)
 
-6.上传[一个演示demo ApkPatchLibraryDemo.apk][8]。（2015-4-26）
+6.上传[一个演示demo ApkPatchLibraryDemo.apk][6]。（2015-4-26）
 
 ## License
 
@@ -350,7 +350,5 @@ ApkPatchLibraryDemo、ApkPatchLibraryDemo2 中用到的V4.5.0版微博，V4.5.5�
   [2]: http://www.daemonology.net/bsdiff/
   [3]: http://www.bzip.org/downloads.html
   [4]: http://my.oschina.net/liucundong/blog
-  [5]: http://pan.baidu.com/s/1hqs1vaG
-  [6]: http://pan.baidu.com/s/1i3tLo6T
-  [7]: http://pan.baidu.com/s/1o6BSaoy
-  [8]: https://github.com/cundong/SmartAppUpdates/blob/master/ApkPatchLibraryDemo.apk
+  [5]: http://pan.baidu.com/s/1T5Szc#path=%252FSmartAppUpdates
+  [6]: https://github.com/cundong/SmartAppUpdates/blob/master/ApkPatchLibraryDemo.apk

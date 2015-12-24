@@ -16,7 +16,7 @@ import java.util.List;
  * 类说明：  Apk工具类
  *
  * @author  Cundong
- * @version 1.0
+ * @version 1.1
  * @date    2013-9-6
  */
 public class ApkUtils {
@@ -32,9 +32,9 @@ public class ApkUtils {
         PackageManager pm = context.getPackageManager();
         List<PackageInfo> apps = pm.getInstalledPackages(PackageManager.GET_SIGNATURES);
 
-        Iterator<PackageInfo> iter = apps.iterator();
-        while (iter.hasNext()) {
-            PackageInfo packageinfo = iter.next();
+        Iterator<PackageInfo> it = apps.iterator();
+        while (it.hasNext()) {
+            PackageInfo packageinfo = it.next();
             String thisName = packageinfo.packageName;
             if (thisName.equals(packageName)) {
                 return packageinfo;
@@ -44,6 +44,13 @@ public class ApkUtils {
         return null;
     }
 
+    /**
+     * 判断apk是否已安装
+     *
+     * @param context
+     * @param packageName
+     * @return
+     */
     public static boolean isInstalled(Context context, String packageName) {
         PackageManager pm = context.getPackageManager();
         boolean installed = false;

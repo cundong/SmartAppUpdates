@@ -1,18 +1,18 @@
 package com.cundong.apkpatch.example;
 
+import android.text.TextUtils;
+import android.util.Log;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.security.MessageDigest;
 
-import android.text.TextUtils;
-import android.util.Log;
-
 /**
  * 类说明：  	apk 签名信息获取工具类
  *
  * @author 	Cundong
- * @date 	2013-9-6
+ * @date 	2015-12-20
  * @version 1.0
  */
 public class SignUtils {
@@ -21,7 +21,7 @@ public class SignUtils {
 
 	private static final String TAG = DEBUG ? "SignUtils" : SignUtils.class.getSimpleName();
 
-	public static String bytes2Hex(byte[] src) {
+	private static String bytes2Hex(byte[] src) {
 		char[] res = new char[src.length * 2];
 		final char hexDigits[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 		for (int i = 0, j = 0; i < src.length; i++) {
@@ -32,7 +32,7 @@ public class SignUtils {
 		return new String(res);
 	}
 
-	public static String getMd5ByFile(File file) {
+	private static String getMd5ByFile(File file) {
 		String value = null;
 		FileInputStream in = null;
 		try {
@@ -59,6 +59,13 @@ public class SignUtils {
 		return value;
 	}
 
+	/**
+	 * 判断文件的MD5是否为指定值
+	 *
+	 * @param file
+	 * @param md5
+	 * @return
+	 */
 	public static boolean checkMd5(File file, String md5) {
 		if (TextUtils.isEmpty(md5)) {
 			throw new RuntimeException("md5 cannot be empty");
@@ -77,6 +84,13 @@ public class SignUtils {
 		}
 	}
 
+	/**
+	 * 判断文件的MD5是否为指定值
+	 *
+	 * @param filePath
+	 * @param md5
+	 * @return
+	 */
 	public static boolean checkMd5(String filePath, String md5) {
 		return checkMd5(new File(filePath), md5);
 	}

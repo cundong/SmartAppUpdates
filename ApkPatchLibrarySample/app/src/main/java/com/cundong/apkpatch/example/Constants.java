@@ -15,7 +15,7 @@ public class Constants {
 
 	public static final boolean DEBUG = true;
 
-	//WeiboV5.5.apk 正确的MD5值
+	//WeiboV5.5.apk 正确的MD5值，如果本地安装的apk MD5值不是TA，说明本地安装的是被二次打包的apk
 	public static final String WEIBO_OLD_MD5 = "7dc46bd75c1042f943942a37d646afaa";
 
 	//WeiboV5.6.apk 正确的MD5值
@@ -26,9 +26,9 @@ public class Constants {
 
 	public static final String PATH = Environment.getExternalStorageDirectory() + File.separator;
 
-	//合成得到的新版微博
+	//合成得到的新版apk
 	public static final String NEW_APK_PATH = PATH + "weiboOldtoNew.apk";
 
-	//从服务器下载来的查分包
+	//从服务器下载来的差分包
 	public static final String PATCH_PATH = PATH + "weibo.patch";
 }

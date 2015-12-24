@@ -10,9 +10,9 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -178,17 +178,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     break;
                 }
                 case WHAT_FAIL_OLD_MD5: {
-                    String text = "现在安装的WeiboV5.5的MD5不对";
+                    String text = "现在安装的WeiboV5.5的MD5不对！";
                     showToast(text);
                     break;
                 }
                 case WHAT_FAIL_GEN_MD5: {
-                    String text = "合成完毕，但是合成得到的APK MD5不对";
+                    String text = "合成完毕，但是合成得到的apk MD5不对！";
                     showToast(text);
                     break;
                 }
                 case WHAT_FAIL_PATCH: {
-                    String text = "新APK已合成失败";
+                    String text = "新apk已合成失败！";
                     showToast(text);
                     break;
                 }

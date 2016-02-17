@@ -295,9 +295,9 @@ public class PatchUtils {
 
 * ApkPatchLibrarySample：一个Sample，手机上安装 Weibo5.5.apk，通过与SD卡上预先存放的weibo.patch文件进行合并，得到Weibo5.6.apk，使用AndroidStudio开发。 
 
-另外， ApkPatchLibraryServer、ApkPatchLibrarySample 中用到的Weibo5.5.apk，Weibo5.6.apk，以及使用ApkPatchLibraryServer生成的差分包(Weibo5.5.apk->Weibo5.6.apk)， [都通过云盘共享了][5]。
-
 * 二进制差分或许有更好的实现方案，如：xdelta；
+
+另外， ApkPatchLibraryServer、ApkPatchLibrarySample 中用到的Weibo5.5.apk，Weibo5.6.apk，以及使用ApkPatchLibraryServer生成的差分包(Weibo5.5.apk->Weibo5.6.apk)， [都通过云盘共享了][5]。
 
 ## 关于我
 

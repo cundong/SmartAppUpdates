@@ -297,6 +297,8 @@ public class PatchUtils {
 
 另外， ApkPatchLibraryServer、ApkPatchLibrarySample 中用到的Weibo5.5.apk，Weibo5.6.apk，以及使用ApkPatchLibraryServer生成的差分包(Weibo5.5.apk->Weibo5.6.apk)， [都通过云盘共享了][5]。
 
+* 二进制差分或许有更好的实现方案，如：xdelta；
+
 ## 关于我
 
 * Blog: [http://my.oschina.net/liucundong/blog][4]

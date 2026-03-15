@@ -7,13 +7,13 @@
 #include <android/log.h>
 #include <jni.h>
 
-#include "bzip2/bzlib.c"
-#include "bzip2/crctable.c"
-#include "bzip2/compress.c"
-#include "bzip2/decompress.c"
-#include "bzip2/randtable.c"
-#include "bzip2/blocksort.c"
-#include "bzip2/huffman.c"
+#include "bzip2/bzlib.h"
+// #include "bzip2/crctable.c"
+// #include "bzip2/compress.c"
+// #include "bzip2/decompress.c"
+// #include "bzip2/randtable.c"
+// #include "bzip2/blocksort.c"
+// #include "bzip2/huffman.c"
 
 #include "com_cundong_utils_PatchUtils.h"
 

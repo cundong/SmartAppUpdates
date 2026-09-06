@@ -8,21 +8,30 @@ compiler=${CC:-/usr/bin/cc}
 
 mkdir -p "$build_dir"
 
-"$compiler" \
-    -std=c99 \
-    -D_FILE_OFFSET_BITS=64 \
-    -Wall -Wextra -Werror \
-    -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function \
-    -I"$project_dir/src/main/cpp" \
-    "$project_dir/src/test/native/bspatch_test.c" \
-    "$project_dir/src/main/cpp/bspatch.c" \
-    "$project_dir/src/main/cpp/bzip2/bzlib.c" \
-    "$project_dir/src/main/cpp/bzip2/compress.c" \
-    "$project_dir/src/main/cpp/bzip2/decompress.c" \
-    "$project_dir/src/main/cpp/bzip2/crctable.c" \
-    "$project_dir/src/main/cpp/bzip2/randtable.c" \
-    "$project_dir/src/main/cpp/bzip2/blocksort.c" \
-    "$project_dir/src/main/cpp/bzip2/huffman.c" \
-    -o "$build_dir/bspatch_test"
+# Compile each translation unit separately so the legacy bzip2 warning exception
+# cannot hide accidental fallthrough in our parser or regression tests.
+compile_object() {
+    source_file=$1
+    object_file=$2
+    shift 2
+    "$compiler" \
+        -std=c99 -D_FILE_OFFSET_BITS=64 \
+        -Wall -Wextra -Werror -Wimplicit-fallthrough \
+        -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function \
+        -I"$project_dir/src/main/cpp" \
+        "$@" -c "$source_file" -o "$object_file"
+}
 
+compile_object "$project_dir/src/test/native/bspatch_test.c" "$build_dir/bspatch_test.o"
+compile_object "$project_dir/src/main/cpp/bspatch.c" "$build_dir/bspatch.o"
+
+set -- "$build_dir/bspatch_test.o" "$build_dir/bspatch.o"
+for unit in bzlib compress decompress crctable randtable blocksort huffman; do
+    # bzip2's resumable decompression state machine intentionally falls through.
+    compile_object "$project_dir/src/main/cpp/bzip2/$unit.c" "$build_dir/$unit.o" \
+        -Wno-implicit-fallthrough
+    set -- "$@" "$build_dir/$unit.o"
+done
+
+"$compiler" "$@" -o "$build_dir/bspatch_test"
 "$build_dir/bspatch_test"

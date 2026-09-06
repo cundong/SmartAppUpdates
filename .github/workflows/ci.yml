@@ -17,6 +17,8 @@ jobs:
       - uses: android-actions/setup-android@v3
       - uses: gradle/actions/setup-gradle@v4
       - run: sh ApkPatchLibrary/scripts/run-host-native-tests.sh
+      - run: sh ApkPatchLibrary/scripts/run-host-jni-tests.sh
+      - run: python3 -B -m unittest discover -s scripts/tests -v
       - run: ./gradlew :server:build --no-daemon
       - run: python3 scripts/check_repository.py
       - run: git diff --check

@@ -16,3 +16,6 @@ Runtime output is in the app's private external files directory (internal storag
 
 Target SDK 36, min SDK 21; the library supplies armeabi-v7a, arm64-v8a and x86_64.
 Build success is not a substitute for device installation testing.
+
+构建读取 `build/generated/fixtures/current/` 指向的完整快照。直接 assets/java 路径为兼容符号链接。
+可通过根 Gradle 参数 `-PfixtureTimeoutSeconds=1200` 与 `-PfixtureLockTimeoutSeconds=1200` 设置操作和锁等待超时。

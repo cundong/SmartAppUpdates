@@ -152,3 +152,11 @@ tasks.register('distributionE2e', JavaExec) {
 
 check.dependsOn e2eTest, distributionE2e
 build.dependsOn compileNative, fatJar
+
+tasks.register('workerLifecycleTest', JavaExec) {
+    group = 'verification'
+    mainClass = 'com.cundong.cli.WorkerLifecycleE2E'
+    classpath = sourceSets.integrationTest.runtimeClasspath
+    dependsOn integrationTestClasses
+}
+tasks.named('check') { dependsOn 'workerLifecycleTest' }

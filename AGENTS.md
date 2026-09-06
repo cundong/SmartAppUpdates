@@ -31,3 +31,7 @@ CI cannot run the proprietary APK flow without local inputs. Do not invent passi
 - Keep small malformed-input and synthetic round-trip tests; real APKs cannot replace boundary tests.
 - Do not commit APKs, generated patch/native libraries, local SDK paths, signing keys or IDE state.
 - Retain third-party attribution when moving or modifying native code.
+
+- Reliability checks: `./gradlew fixtureScriptTest :server:workerLifecycleTest :apkPatchLibrary:hostJniTest`.
+- Fixture publication uses a locked immutable generation and an atomic current symlink; retain this contract.
+- CLI/Python worker cancellation must reap subprocesses before removing staged output.

@@ -15,8 +15,8 @@ android {
         targetCompatibility JavaVersion.VERSION_17
     }
     sourceSets.main {
-        assets.srcDir layout.buildDirectory.dir('generated/fixtures/assets')
-        java.srcDir layout.buildDirectory.dir('generated/fixtures/java')
+        assets.srcDir layout.buildDirectory.dir('generated/fixtures/current/assets')
+        java.srcDir layout.buildDirectory.dir('generated/fixtures/current/java')
     }
 }
 dependencies { implementation project(':apkPatchLibrary') }
@@ -31,7 +31,9 @@ tasks.register('verifyFixtures', Exec) {
             '--java', new File(System.getProperty('java.home'), 'bin/java'),
             '--classpath', server.sourceSets.main.runtimeClasspath.asPath,
             '--library-path', server.layout.buildDirectory.dir('native').get().asFile,
-            '--output', layout.buildDirectory.dir('generated/fixtures').get().asFile
+            '--output', layout.buildDirectory.dir('generated/fixtures').get().asFile,
+            '--timeout-seconds', providers.gradleProperty('fixtureTimeoutSeconds').getOrElse('900'),
+            '--lock-timeout-seconds', providers.gradleProperty('fixtureLockTimeoutSeconds').getOrElse('900')
     }
 }
 tasks.named('preBuild') { dependsOn 'verifyFixtures' }

@@ -21,3 +21,9 @@ tasks.register('hostNativeTest', Exec) {
     commandLine 'sh', file('scripts/run-host-native-tests.sh')
 }
 tasks.named('check') { dependsOn 'hostNativeTest' }
+
+tasks.register('hostJniTest', Exec) {
+    group = 'verification'
+    commandLine 'sh', file('scripts/run-host-jni-tests.sh')
+}
+tasks.named('check') { dependsOn 'hostJniTest' }

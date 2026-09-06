@@ -39,6 +39,7 @@ patch <old> <new> <patch>
 | `66` | 输入路径无效 |
 | `70` | native worker 加载或执行失败 |
 | `73` | 输出路径无效或已存在 |
+| `124` | 超时，worker 已终止 |
 
 原始 bsdiff 实现会在部分错误上直接结束进程，因此 CLI 把 native 调用隔离到子
 JVM，并将其非零结果统一映射为 `70`。
@@ -69,3 +70,5 @@ java -jar build/libs/ApkPatchLibraryServer-2.0-all.jar \
 
 Patch and bzip2 sources are shared with the Android library. The CLI remains generic;
 `./gradlew verifyFixtures` runs the real Taobao pair from `Apks/fixtures.json`.
+
+CLI 可在命令前加 `--timeout-seconds N`（1–86400，默认 900）。超时与中断会回收 worker，失败不发布输出。

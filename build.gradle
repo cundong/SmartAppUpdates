@@ -13,3 +13,9 @@ tasks.register('repositoryCheck', Exec) {
     commandLine 'python3', file('scripts/check_repository.py')
 }
 tasks.named('check') { dependsOn 'repositoryCheck' }
+
+tasks.register('fixtureScriptTest', Exec) {
+    group = 'verification'
+    commandLine 'python3', '-B', '-m', 'unittest', 'discover', '-s', file('scripts/tests'), '-v'
+}
+tasks.named('check') { dependsOn 'fixtureScriptTest' }

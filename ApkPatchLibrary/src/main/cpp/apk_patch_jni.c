@@ -36,30 +36,30 @@ JNIEXPORT jint JNICALL Java_com_cundong_utils_PatchUtils_patch(JNIEnv *env,
 		return BSPATCH_ERR_INVALID_ARGUMENT;
 	}
 
-	const char *oldFile = (*env)->GetStringUTFChars(env, oldPath, NULL);
-	const char *newFile = (*env)->GetStringUTFChars(env, newPath, NULL);
-	const char *patchFile = (*env)->GetStringUTFChars(env, patchPath, NULL);
+	const char *oldFile = NULL, *newFile = NULL, *patchFile = NULL;
+	int result = BSPATCH_ERR_INVALID_ARGUMENT;
 
-	if (oldFile == NULL || newFile == NULL || patchFile == NULL) {
-		/* GetStringUTFChars 失败时 JVM 已抛出 OutOfMemoryError，直接返回 */
-		LOGE("GetStringUTFChars failed");
-		if (oldFile != NULL) (*env)->ReleaseStringUTFChars(env, oldPath, oldFile);
-		if (newFile != NULL) (*env)->ReleaseStringUTFChars(env, newPath, newFile);
-		if (patchFile != NULL) (*env)->ReleaseStringUTFChars(env, patchPath, patchFile);
-		return BSPATCH_ERR_INVALID_ARGUMENT;
-	}
+	/* A failed conversion leaves a pending JVM exception. Only cleanup JNI calls
+	 * are legal until we return; do not attempt another conversion. */
+	oldFile = (*env)->GetStringUTFChars(env, oldPath, NULL);
+	if (oldFile == NULL) goto cleanup;
+	newFile = (*env)->GetStringUTFChars(env, newPath, NULL);
+	if (newFile == NULL) goto cleanup;
+	patchFile = (*env)->GetStringUTFChars(env, patchPath, NULL);
+	if (patchFile == NULL) goto cleanup;
 
 	LOGI("old   = %s", oldFile);
 	LOGI("new   = %s", newFile);
 	LOGI("patch = %s", patchFile);
 
-	int result = bspatch(oldFile, newFile, patchFile);
+	result = bspatch(oldFile, newFile, patchFile);
 
 	LOGI("bspatch result = %d", result);
 
-	(*env)->ReleaseStringUTFChars(env, oldPath, oldFile);
-	(*env)->ReleaseStringUTFChars(env, newPath, newFile);
-	(*env)->ReleaseStringUTFChars(env, patchPath, patchFile);
+cleanup:
+	if (oldFile != NULL) (*env)->ReleaseStringUTFChars(env, oldPath, oldFile);
+	if (newFile != NULL) (*env)->ReleaseStringUTFChars(env, newPath, newFile);
+	if (patchFile != NULL) (*env)->ReleaseStringUTFChars(env, patchPath, patchFile);
 
 	return result;
 }

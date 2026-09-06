@@ -9,9 +9,11 @@ import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /** Command-line entry point for generating and applying BSDIFF40 patches. */
 public final class ApkPatchCli {
@@ -21,6 +23,7 @@ public final class ApkPatchCli {
     public static final int EXIT_INPUT = 66;
     public static final int EXIT_NATIVE = 70;
     public static final int EXIT_OUTPUT = 73;
+    public static final int EXIT_TIMEOUT = 124;
 
     private ApkPatchCli() {
     }
@@ -30,6 +33,18 @@ public final class ApkPatchCli {
     }
 
     static int run(String[] args, PrintStream out, PrintStream err) {
+        long timeoutSeconds = 900;
+        if (args.length > 0 && "--timeout-seconds".equals(args[0])) {
+            try {
+                if (args.length != 6) throw new IllegalArgumentException();
+                timeoutSeconds = Long.parseLong(args[1]);
+                if (timeoutSeconds < 1 || timeoutSeconds > 86400) throw new IllegalArgumentException();
+                args = Arrays.copyOfRange(args, 2, args.length);
+            } catch (IllegalArgumentException e) {
+                err.println("--timeout-seconds must be an integer between 1 and 86400");
+                return EXIT_USAGE;
+            }
+        }
         if (args.length != 4) {
             printUsage(err);
             return EXIT_USAGE;
@@ -65,7 +80,10 @@ public final class ApkPatchCli {
             int workerExit;
             try {
                 workerExit = runNativeWorker(
-                        command, oldFile, newFile, patchFile, temporaryOutput, err);
+                        command, oldFile, newFile, patchFile, temporaryOutput, err, timeoutSeconds);
+            } catch (TimeoutException e) {
+                err.println("Native worker exceeded " + timeoutSeconds + " seconds and was terminated");
+                return EXIT_TIMEOUT;
             } catch (IOException e) {
                 err.println("Unable to start native worker: " + e.getMessage());
                 return EXIT_NATIVE;
@@ -189,8 +207,8 @@ public final class ApkPatchCli {
     }
 
     private static int runNativeWorker(Command command, Path oldFile, Path newFile, Path patchFile,
-            Path temporaryOutput, PrintStream err)
-            throws IOException, InterruptedException {
+            Path temporaryOutput, PrintStream err, long timeoutSeconds)
+            throws IOException, InterruptedException, TimeoutException {
         String javaExecutable = Paths.get(System.getProperty("java.home"), "bin", "java").toString();
         String classPath = System.getProperty("java.class.path");
         String libraryPath = System.getProperty("java.library.path", "");
@@ -210,29 +228,17 @@ public final class ApkPatchCli {
                 .inheritIO()
                 .start();
         Thread shutdownHook = new Thread(() -> {
-            process.destroy();
-            try {
-                if (!process.waitFor(2, TimeUnit.SECONDS)) {
-                    process.destroyForcibly();
-                }
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                process.destroyForcibly();
-            }
+            stopWorker(process);
             deleteTemporaryOutput(temporaryOutput, err);
         }, "apk-patcher-worker-cleanup");
         boolean hookRegistered = false;
         try {
             Runtime.getRuntime().addShutdownHook(shutdownHook);
             hookRegistered = true;
-            return process.waitFor();
-        } catch (InterruptedException e) {
-            process.destroy();
-            if (!process.waitFor(2, TimeUnit.SECONDS)) {
-                process.destroyForcibly();
-            }
-            throw e;
+            return waitForWorker(process, TimeUnit.SECONDS.toMillis(timeoutSeconds));
         } finally {
+            // Also covers hook-registration failures and interruption during waiting.
+            stopWorker(process);
             if (hookRegistered) {
                 try {
                     Runtime.getRuntime().removeShutdownHook(shutdownHook);
@@ -240,6 +246,43 @@ public final class ApkPatchCli {
                     // JVM 已进入关闭流程，此时 shutdownHook 会负责回收。
                 }
             }
+        }
+    }
+
+    /** Shared by production and integration checks using a real child process. */
+    static int waitForWorker(Process process, long timeoutMillis)
+            throws InterruptedException, TimeoutException {
+        try {
+            if (!process.waitFor(timeoutMillis, TimeUnit.MILLISECONDS)) {
+                throw new TimeoutException("Native worker timed out");
+            }
+            return process.exitValue();
+        } finally {
+            stopWorker(process);
+        }
+    }
+
+    private static void stopWorker(Process process) {
+        if (!process.isAlive()) return;
+        boolean interrupted = Thread.interrupted();
+        process.destroy();
+        try {
+            try {
+                if (!process.waitFor(2, TimeUnit.SECONDS)) process.destroyForcibly();
+            } catch (InterruptedException e) {
+                interrupted = true;
+                process.destroyForcibly();
+            }
+            while (process.isAlive()) {
+                try {
+                    process.waitFor();
+                } catch (InterruptedException e) {
+                    interrupted = true;
+                    process.destroyForcibly();
+                }
+            }
+        } finally {
+            if (interrupted) Thread.currentThread().interrupt();
         }
     }
 
@@ -255,7 +298,7 @@ public final class ApkPatchCli {
     }
 
     private static void printUsage(PrintStream stream) {
-        stream.println("Usage:");
+        stream.println("Usage (optional prefix: --timeout-seconds 1..86400; default 900):");
         stream.println("  apk-patcher diff <old> <new> <patch>");
         stream.println("  apk-patcher patch <old> <new> <patch>");
     }

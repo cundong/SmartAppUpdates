@@ -1,10 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">ApkPatchSample</string>
-    <string name="action_settings">Settings</string>
 
-    <string name="demo_info1">1.先安装WeiboV5.5（已通过云盘共享）</string>
-    <string name="demo_info2">2.将由服务器端生成的差分文件 weibo.patch（V5.5->V5.6）拷贝至：/sdcard/weibo.patch（已通过云盘共享）</string>
-    <string name="demo_info3">3.点击 Start</string>
-    <string name="demo_start">Start</string>
+    <string name="demo_title">APK 本地增量合成演示</string>
+    <string name="demo_info1">1. 淘宝 10.65.10 与升级到 10.65.20 的差分包已就绪</string>
+    <string name="demo_info2">2. 点击开始后，Demo 在本地复制输入并调用 ApkPatchLibrary 合成 淘宝 10.65.20 APK</string>
+    <string name="demo_info3">3. 输入与输出均通过 SHA-256 校验；成功后自动拉起系统安装确认页</string>
+    <string name="demo_start">开始本地合成</string>
     <string name="demo_github">GitHub</string>
+
+    <string name="status_copying_assets">[1/5] 正在复制 assets 中的 old.apk 与 update.patch…</string>
+    <string name="status_verifying_inputs">[2/5] 正在校验输入文件 SHA-256…</string>
+    <string name="status_patching">[3/5] 正在本地合成 淘宝 10.65.20 APK…</string>
+    <string name="status_verifying_output">[4/5] 正在校验合成结果 SHA-256…</string>
+    <string name="status_preparing_install">[5/5] 正在准备并自动拉起系统安装确认页…</string>
+    <string name="status_install_confirmation_launched">[5/5] 已拉起系统安装确认页，等待用户选择…</string>
+    <string name="status_install_success">安装结果：成功</string>
+    <string name="status_install_failure">安装结果：失败（%1$s）</string>
+    <string name="result_success">合成成功\n耗时：%1$d ms\n文件大小：%2$s\n输出路径：%3$s\nSHA-256：%4$s</string>
+    <string name="result_failure">合成失败\n耗时：%1$d ms\n原因：%2$s</string>
+    <string name="toast_patch_success">本地合成与 SHA-256 校验成功，正在准备安装</string>
+    <string name="toast_patch_failure">本地合成失败，请查看页面详情</string>
+    <string name="toast_patch_in_progress">已有本地合成任务正在运行，请稍候后重试</string>
+    <string name="toast_patch_start_failure">无法启动本地合成任务，请重试</string>
+    <string name="toast_install_in_progress">已有安装流程正在进行，请先完成或取消系统确认</string>
+    <string name="toast_install_settings_unavailable">系统未提供“安装未知应用”设置页</string>
+    <string name="toast_install_permission_denied">未允许此来源安装应用，已取消安装动作</string>
+    <string name="toast_install_prepare_failure">准备系统安装失败：%1$s</string>
+    <string name="toast_install_success">淘宝 10.65.20 APK 安装成功</string>
+    <string name="toast_install_failure">淘宝 10.65.20 APK 安装失败：%1$s</string>
 </resources>

@@ -1,0 +1,37 @@
+name: Public source checks
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  host:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - uses: gradle/actions/setup-gradle@v4
+      - run: sh ApkPatchLibrary/scripts/run-host-native-tests.sh
+      - run: sh ApkPatchLibrary/scripts/run-host-jni-tests.sh
+      - run: python3 -B -m unittest discover -s scripts/tests -v
+      - run: ./gradlew :server:build --no-daemon
+      - run: python3 scripts/check_repository.py
+      - run: git diff --check
+  android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - uses: gradle/actions/setup-gradle@v4
+      - run: sdkmanager 'platforms;android-36' 'build-tools;35.0.0' 'ndk;29.0.14206865' 'cmake;3.31.6'
+      - run: ./gradlew :apkPatchLibrary:check :apkPatchLibrary:assembleDebug :apkPatchLibrary:assembleRelease --no-daemon
+      # Proprietary Taobao APKs stay local; no Sample artifact is uploaded.

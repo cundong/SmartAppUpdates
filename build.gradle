@@ -1,0 +1,21 @@
+plugins {
+    id 'base'
+    id 'com.android.library' version '8.10.1' apply false
+    id 'com.android.application' version '8.10.1' apply false
+}
+allprojects { repositories { google(); mavenCentral() } }
+tasks.register('verifyFixtures') { dependsOn ':app:verifyFixtures' }
+tasks.named('check') { dependsOn ':apkPatchLibrary:check', ':server:check', ':app:lintDebug' }
+tasks.named('build') { dependsOn ':apkPatchLibrary:assembleRelease', ':server:build', ':app:assembleDebug' }
+
+tasks.register('repositoryCheck', Exec) {
+    group = 'verification'
+    commandLine 'python3', file('scripts/check_repository.py')
+}
+tasks.named('check') { dependsOn 'repositoryCheck' }
+
+tasks.register('fixtureScriptTest', Exec) {
+    group = 'verification'
+    commandLine 'python3', '-B', '-m', 'unittest', 'discover', '-s', file('scripts/tests'), '-v'
+}
+tasks.named('check') { dependsOn 'fixtureScriptTest' }

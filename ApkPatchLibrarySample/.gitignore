@@ -5,3 +5,6 @@
 .DS_Store
 /build
 /captures
+
+# 各模块构建产物
+build/

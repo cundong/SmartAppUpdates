@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 库模块无组件，仅声明包名（AGP 7.2 尚无 namespace 属性，包名必须在 manifest 声明） -->
+<manifest />

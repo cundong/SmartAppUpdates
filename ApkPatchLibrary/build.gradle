@@ -1,0 +1,29 @@
+plugins { id 'com.android.library' }
+android {
+    namespace 'com.cundong.apkpatch'
+    compileSdk 36
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    ndkVersion '29.0.14206865'
+    defaultConfig {
+        minSdk 21
+        ndk { abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86_64' }
+    }
+    externalNativeBuild { cmake {
+        path file('src/main/cpp/CMakeLists.txt')
+        version '3.31.6'
+    } }
+}
+tasks.register('hostNativeTest', Exec) {
+    group = 'verification'
+    commandLine 'sh', file('scripts/run-host-native-tests.sh')
+}
+tasks.named('check') { dependsOn 'hostNativeTest' }
+
+tasks.register('hostJniTest', Exec) {
+    group = 'verification'
+    commandLine 'sh', file('scripts/run-host-jni-tests.sh')
+}
+tasks.named('check') { dependsOn 'hostJniTest' }

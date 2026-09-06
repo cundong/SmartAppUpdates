@@ -1,0 +1,13 @@
+pluginManagement {
+    repositories { google(); mavenCentral(); gradlePluginPortal() }
+    resolutionStrategy { eachPlugin {
+        if (requested.id.id.startsWith('com.android.')) {
+            useModule("com.android.tools.build:gradle:${requested.version}")
+        }
+    } }
+}
+rootProject.name = 'SmartAppUpdates'
+include ':apkPatchLibrary', ':app', ':server'
+project(':apkPatchLibrary').projectDir = file('ApkPatchLibrary')
+project(':app').projectDir = file('ApkPatchLibrarySample/app')
+project(':server').projectDir = file('ApkPatchLibraryServer')

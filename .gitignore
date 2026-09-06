@@ -1,13 +1,43 @@
-gen/*
-bin/*
-obj/*
+# Build products and caches at any depth
+.gradle/
+build/
+.cxx/
+.externalNativeBuild/
+bin/
+gen/
+obj/
+Debug/
+Release/
+# Local IDE / machine state
+.idea/
+*.iml
+*.ipr
+*.iws
+.settings/
+.classpath
+.cproject
+.project
+.DS_Store
+local.properties
+# Local APK fixtures and generated binaries
+*.apk
+*.ap_
+*.aab
+*.aar
+*.so
+*.dylib
+*.dll
+*.o
+*.class
+# Credentials and signing material
+.env
+.env.*
+!.env.example
+*.jks
+*.keystore
+*.p12
+*.pfx
+*.key
 
-ApkPatchLibraryDemo/bin/*
-ApkPatchLibraryDemo/gen/*
-
-ApkPatchLibraryDemo2/bin/*
-ApkPatchLibraryDemo2/gen/*
-
-ApkPatchLibraryServer/bin/*
-ApkPatchLibraryServer/Debug/*
-ApkPatchLibraryServer/Release/*
+__pycache__/
+*.pyc

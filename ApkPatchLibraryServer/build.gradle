@@ -1,0 +1,162 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+group = 'com.cundong'
+version = '2.0'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+repositories {
+    mavenCentral()
+}
+
+// Host C compiler; CC may override the executable.
+def cc = System.getenv('CC') ?: 'cc'
+def osName = System.getProperty('os.name', '').toLowerCase()
+def onMac = osName.contains('mac')
+def onLinux = osName.contains('linux')
+assert onMac || onLinux : "暂支持 macOS / Linux，当前不可识别系统: ${osName}"
+
+// Native architecture must match the running JVM, including Rosetta on macOS.
+def jvmArch = System.getProperty('os.arch', '')
+// java 的 os.arch 报 x86_64 / aarch64 等；Apple silicon 上跑 x64 JVM 时它是 x86_64
+def ccArch = (jvmArch == 'aarch64' || jvmArch == 'arm64') ? 'arm64' : 'x86_64'
+def archFlag = []
+// 仅宿主 gcc（clang）需显式 -arch 来对目标架构；Linux 不传
+if (onMac) archFlag = [ '-arch', ccArch ]
+
+// JDK 的 include 目录（jni.h 所在）：可能是 x64/jdk17 标准布局
+def javaHome = file(System.getProperty('java.home'))
+def jniIncludeRoot = file("${javaHome}/include")
+def jniIncludePlat = new File(jniIncludeRoot, onMac ? 'darwin' : 'linux')
+
+// native 源：业务 JNI 2 个 + bzlib 库体 7 个。
+// bzip2 下的 dlltest.c / bzip2.c 含 main()（独立命令行程序），不得编入动态库。
+def bzip2Src = ['bzlib', 'compress', 'decompress', 'crctable',
+                'randtable', 'blocksort', 'huffman'].collect { "../ApkPatchLibrary/src/main/cpp/bzip2/${it}.c" }
+def nativeSrc = ['jni/com_cundong_utils_DiffUtils.c',
+                 '../ApkPatchLibrary/src/main/cpp/apk_patch_jni.c',
+                 '../ApkPatchLibrary/src/main/cpp/bspatch.c'] + bzip2Src
+def nativeHeaders = fileTree('jni') {
+    include '**/*.h'
+}
+def soName = onMac ? 'libApkPatchLibraryServer.dylib' : 'libApkPatchLibraryServer.so'
+def nativeOut = layout.buildDirectory.file("native/${soName}").get().asFile
+def nativeLibDir = nativeOut.parentFile
+
+task compileNative(type: Exec) {
+    description '用宿主机 C 编译器把 jni/*.c + bzip2 编成 libApkPatchLibraryServer 动态库（与当前 JVM 同架构）'
+    group 'build'
+    inputs.files(nativeSrc.collect { file(it) })
+    inputs.files(nativeHeaders)
+    inputs.files(fileTree("../ApkPatchLibrary/src/main/cpp") { include "**/*.h" })
+    inputs.property('targetOs', osName)
+    inputs.property('targetArch', ccArch)
+    outputs.file(nativeOut)
+
+    doFirst {
+        if (!nativeLibDir.isDirectory() && !nativeLibDir.mkdirs()) {
+            throw new GradleException("无法创建 native 输出目录: ${nativeLibDir}")
+        }
+        def incArgs = ["-I${jniIncludeRoot.absolutePath}"]
+        if (jniIncludePlat.isDirectory()) incArgs << "-I${jniIncludePlat.absolutePath}"
+        incArgs << '-Ijni' << '-I../ApkPatchLibrary/src/main/cpp' << '-I../ApkPatchLibrary/src/main/cpp/bzip2'
+
+        commandLine cc,
+                '-shared', '-fPIC', '-O2',
+                *archFlag,
+                *incArgs,
+                *nativeSrc,
+                '-o', nativeOut.absolutePath
+    }
+}
+
+// ---------------- Java 编译 / 打包 ----------------
+// Keep standalone CLI integration checks separate from the JUnit test source set.
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src']
+            exclude 'test/**', 'integrationTest/**'
+        }
+    }
+    integrationTest {
+        java.srcDirs = ['src/integrationTest/java']
+        compileClasspath += sourceSets.main.output
+        runtimeClasspath += sourceSets.main.output
+    }
+}
+
+// fat jar：Java + native，方便 `java -jar` 直接运行。
+def fatJar = tasks.register('fatJar', Jar) {
+    archiveClassifier = 'all'
+    dependsOn compileNative
+    from sourceSets.main.output
+    from nativeOut
+    manifest {
+        attributes 'Main-Class': 'com.cundong.cli.ApkPatchCli'
+    }
+}
+
+application {
+    mainClass = 'com.cundong.cli.ApkPatchCli'
+    applicationName = 'apk-patcher'
+}
+
+// 默认 jar 也带上 native；NativeWorker 会先从 JAR 资源提取，再 System.load 绝对路径。
+jar {
+    dependsOn compileNative
+    from nativeOut
+}
+
+tasks.named('run') {
+    dependsOn compileNative
+    jvmArgs "-Djava.library.path=${nativeLibDir.absolutePath}"
+}
+
+tasks.register('e2eTest', JavaExec) {
+    group 'verification'
+    description '在独立 JVM 中验证小文件 diff -> patch 字节级闭环和覆盖保护'
+    mainClass = 'com.cundong.cli.ApkPatchCliE2E'
+    classpath = sourceSets.integrationTest.runtimeClasspath
+    dependsOn compileNative, integrationTestClasses
+    systemProperty 'apkPatcher.javaExecutable', new File(System.getProperty('java.home'), 'bin/java').absolutePath
+    systemProperty 'apkPatcher.classpath', sourceSets.main.runtimeClasspath.asPath
+    systemProperty 'apkPatcher.libraryPath', nativeLibDir.absolutePath
+}
+
+def relocatedInstallDir = layout.buildDirectory.dir('relocated-install/apk-patcher')
+
+tasks.register('relocateInstall', Sync) {
+    group 'distribution'
+    description 'Copies installDist to a different directory for portability verification.'
+    dependsOn installDist
+    from layout.buildDirectory.dir('install/apk-patcher')
+    into relocatedInstallDir
+}
+
+tasks.register('distributionE2e', JavaExec) {
+    group 'verification'
+    description 'Runs diff -> patch through a relocated application distribution.'
+    mainClass = 'com.cundong.cli.ApkPatchCliE2E'
+    classpath = sourceSets.integrationTest.runtimeClasspath
+    dependsOn relocateInstall, integrationTestClasses
+    systemProperty 'apkPatcher.launcher',
+            new File(relocatedInstallDir.get().asFile, 'bin/apk-patcher').absolutePath
+}
+
+check.dependsOn e2eTest, distributionE2e
+build.dependsOn compileNative, fatJar
+
+tasks.register('workerLifecycleTest', JavaExec) {
+    group = 'verification'
+    mainClass = 'com.cundong.cli.WorkerLifecycleE2E'
+    classpath = sourceSets.integrationTest.runtimeClasspath
+    dependsOn integrationTestClasses
+}
+tasks.named('check') { dependsOn 'workerLifecycleTest' }

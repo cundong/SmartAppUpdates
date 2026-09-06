@@ -1,0 +1,10 @@
+/.DS_Store
+/.classpath
+/.cproject
+/.project
+/.settings/
+/.gradle/
+/build/
+/out/
+/libApkPatchLibraryServer.dylib
+/libApkPatchLibraryServer.so

@@ -16,7 +16,7 @@ Run from the repository root, using `./gradlew`:
 - Native-only without Android: `sh ApkPatchLibrary/scripts/run-host-native-tests.sh`.
 
 See README for pinned toolchains. Report exactly what was run and any device/network limitations.
-CI cannot run the proprietary APK flow without local inputs. Do not invent passing results.
+The current CI workflow does not run the real-APK sample flow. Do not invent passing results.
 
 ## Contracts
 
@@ -29,7 +29,7 @@ CI cannot run the proprietary APK flow without local inputs. Do not invent passi
 - `scripts/prepare_fixtures.py` owns assets and FixtureMetadata; never hand-edit generated files.
 - Preserve system installation confirmation and output hash/package/version validation.
 - Keep small malformed-input and synthetic round-trip tests; real APKs cannot replace boundary tests.
-- Do not commit APKs, generated patch/native libraries, local SDK paths, signing keys or IDE state.
+- Only the two explicitly approved APK fixtures may be committed; verify their pinned digests. Do not commit other APKs, generated patch/native libraries, local SDK paths, signing keys or IDE state.
 - Retain third-party attribution when moving or modifying native code.
 
 - Reliability checks: `./gradlew fixtureScriptTest :server:workerLifecycleTest :apkPatchLibrary:hostJniTest`.

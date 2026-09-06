@@ -34,4 +34,4 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
       - run: sdkmanager 'platforms;android-36' 'build-tools;35.0.0' 'ndk;29.0.14206865' 'cmake;3.31.6'
       - run: ./gradlew :apkPatchLibrary:check :apkPatchLibrary:assembleDebug :apkPatchLibrary:assembleRelease --no-daemon
-      # Proprietary Taobao APKs stay local; no Sample artifact is uploaded.
+      # The APK fixtures are tracked; this workflow does not build or upload the Sample.

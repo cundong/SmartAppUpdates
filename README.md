@@ -105,7 +105,7 @@ The sample uses the APK pair pinned in [Apks/fixtures.json](Apks/fixtures.json):
 | Old | `Apks/淘宝v10.65.10.apk` | `com.taobao.taobao` | 855 |
 | New | `Apks/淘宝v10.65.20.apk` | `com.taobao.taobao` | 856 |
 
-These third-party APKs are **not distributed with the repository**. Supply matching files locally to build the sample. They are ignored by Git; Git LFS is not required. The library and CLI can be built without them.
+These two third-party APK samples are tracked directly in Git; Git LFS is not required. Their exact digests are pinned in the fixture manifest. Other APKs and generated binaries remain excluded. The library and CLI can also be built without the samples.
 
 ```sh
 ./gradlew verifyFixtures :app:assembleDebug :app:lintDebug
@@ -144,7 +144,7 @@ Full local checks and builds, including the sample, require both APKs:
 ./gradlew :app:assembleRelease :app:lintRelease
 ```
 
-The [GitHub Actions workflow](.github/workflows/ci.yml) covers native and JNI regressions, fixture-generation infrastructure, CLI round trips and relocated distributions, and Android library builds. It does not download third-party APKs or run the real-APK sample flow. Synthetic boundary tests complement the real-APK checks.
+The [GitHub Actions workflow](.github/workflows/ci.yml) covers native and JNI regressions, fixture-generation infrastructure, CLI round trips and relocated distributions, and Android library builds. Checkout includes the tracked APK samples, but the workflow does not run the real-APK sample flow. Synthetic boundary tests complement the real-APK checks.
 
 ## Scope and limitations
 

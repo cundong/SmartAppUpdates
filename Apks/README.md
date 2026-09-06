@@ -1,6 +1,6 @@
-# Local Taobao fixtures
+# Taobao APK fixtures
 
-Keep these supplied files here (ignored by Git):
+These two APK samples are tracked directly in Git:
 
 - 淘宝v10.65.10.apk: old, versionCode 855
 - 淘宝v10.65.20.apk: new, versionCode 856

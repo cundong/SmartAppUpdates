@@ -19,8 +19,10 @@ Release/
 .project
 .DS_Store
 local.properties
-# Local APK fixtures and generated binaries
+# APKs and generated binaries (two approved fixtures excepted)
 *.apk
+!/Apks/淘宝v10.65.10.apk
+!/Apks/淘宝v10.65.20.apk
 *.ap_
 *.aab
 *.aar

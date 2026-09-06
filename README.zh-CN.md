@@ -105,7 +105,7 @@ if (result == PatchUtils.SUCCESS) {
 | 旧版 | `Apks/淘宝v10.65.10.apk` | `com.taobao.taobao` | 855 |
 | 新版 | `Apks/淘宝v10.65.20.apk` | `com.taobao.taobao` | 856 |
 
-仓库**不分发这些第三方 APK**。构建示例前，需要在本地提供与配置匹配的文件。APK 已由 Git 忽略，无需配置 Git LFS。单独构建合成库和 CLI 不需要这些文件。
+这两个第三方 APK 样本直接随 Git 仓库提供，无需配置 Git LFS，文件摘要由样本配置固定。其他 APK 和生成产物仍由 Git 排除。单独构建合成库和 CLI 不需要这些样本。
 
 ```sh
 ./gradlew verifyFixtures :app:assembleDebug :app:lintDebug
@@ -144,7 +144,7 @@ git diff --check
 ./gradlew :app:assembleRelease :app:lintRelease
 ```
 
-[GitHub Actions 工作流](.github/workflows/ci.yml) 覆盖原生代码与 JNI 回归、资源生成流程、CLI 差分合成闭环与分发包迁移测试，以及 Android 库构建。CI 不下载第三方 APK，也不执行真实 APK 的示例流程。小型合成数据的边界测试与真实 APK 验证相互补充。
+[GitHub Actions 工作流](.github/workflows/ci.yml) 覆盖原生代码与 JNI 回归、资源生成流程、CLI 差分合成闭环与分发包迁移测试，以及 Android 库构建。CI 检出仓库时会获取这两个样本，但当前工作流不执行真实 APK 的示例流程。小型合成数据的边界测试与真实 APK 验证相互补充。
 
 ## 适用范围与限制
 

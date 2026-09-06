@@ -1,0 +1,15 @@
+{
+  "packageName": "com.taobao.taobao",
+  "old": {
+    "file": "淘宝v10.65.10.apk",
+    "versionName": "10.65.10",
+    "versionCode": 855,
+    "sha256": "a4dbcc28fafc204047c5d935f9aaa8a223e902a51971467b906b714f5b71de6d"
+  },
+  "new": {
+    "file": "淘宝v10.65.20.apk",
+    "versionName": "10.65.20",
+    "versionCode": 856,
+    "sha256": "24f8c5784857626f9fc784c9a8b8221779865ba01ddb15ef9670fcf14a4e77b4"
+  }
+}

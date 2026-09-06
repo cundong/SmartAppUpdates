@@ -1,0 +1,108 @@
+#!/usr/bin/env python3
+"""Build local Sample inputs from the two pinned Taobao APKs; never download APKs."""
+import argparse
+import hashlib
+import json
+from pathlib import Path
+import shutil
+import subprocess
+import tempfile
+import os
+
+ROOT = Path(__file__).resolve().parents[1]
+
+def sha256(path):
+    digest = hashlib.sha256()
+    with path.open('rb') as stream:
+        for block in iter(lambda: stream.read(1024 * 1024), b''):
+            digest.update(block)
+    return digest.hexdigest()
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--java', default=shutil.which('java') or 'java')
+    parser.add_argument('--classpath', default=str(ROOT / 'ApkPatchLibraryServer/build/classes/java/main'))
+    parser.add_argument('--library-path', default=str(ROOT / 'ApkPatchLibraryServer/build/native'))
+    parser.add_argument('--output', type=Path, default=ROOT / 'ApkPatchLibrarySample/app/build/generated/fixtures')
+    args = parser.parse_args()
+    config_file = ROOT / 'Apks/fixtures.json'
+    config = json.loads(config_file.read_text())
+    paths = {}
+    for role in ('old', 'new'):
+        spec = config[role]
+        path = ROOT / 'Apks' / spec['file']
+        if not path.is_file():
+            raise ValueError('Missing local APK: ' + str(path))
+        actual = sha256(path)
+        if actual != spec['sha256']:
+            raise ValueError(f'{role} APK SHA-256 mismatch: {actual}')
+        paths[role] = path
+    # Content fingerprint includes native and CLI implementation, not just APK names.
+    digest = hashlib.sha256(config_file.read_bytes())
+    sources = sorted((ROOT / 'ApkPatchLibrary/src/main/cpp').rglob('*'))
+    sources += sorted((ROOT / 'ApkPatchLibraryServer/jni').rglob('*'))
+    sources += sorted((ROOT / 'ApkPatchLibraryServer/src/com').rglob('*.java'))
+    for source in sources:
+        if source.is_file():
+            digest.update(str(source.relative_to(ROOT)).encode())
+            digest.update(source.read_bytes())
+    fingerprint = digest.hexdigest()
+    out = args.output.resolve()
+    out.mkdir(parents=True, exist_ok=True)
+    manifest_file = out / 'verified.json'
+    assets = out / 'assets'
+    cached = None
+    if manifest_file.is_file():
+        try:
+            cached = json.loads(manifest_file.read_text())
+            if (cached['fingerprint'] != fingerprint
+                    or sha256(assets / 'old.apk') != config['old']['sha256']
+                    or sha256(assets / 'update.patch') != cached['patchSha256']):
+                cached = None
+        except (OSError, ValueError, KeyError):
+            cached = None
+    if cached is None:
+        java = [args.java, '-Djava.library.path=' + str(Path(args.library_path).resolve()),
+                '-cp', args.classpath, 'com.cundong.cli.ApkPatchCli']
+        with tempfile.TemporaryDirectory(prefix='prepare-', dir=out) as stage:
+            stage = Path(stage)
+            patch = stage / 'update.patch'
+            rebuilt = stage / 'rebuilt.apk'
+            print('Generating Taobao 10.65.10 -> 10.65.20 delta (may take several minutes)...', flush=True)
+            subprocess.run(java + ['diff', str(paths['old']), str(paths['new']), str(patch)], check=True)
+            subprocess.run(java + ['patch', str(paths['old']), str(rebuilt), str(patch)], check=True)
+            if sha256(rebuilt) != config['new']['sha256']:
+                raise ValueError('Rebuilt APK does not match the new Taobao APK')
+            # Compare bytes too: the real pair exercises server diff + shared client bspatch.
+            with rebuilt.open('rb') as left, paths['new'].open('rb') as right:
+                while True:
+                    block = left.read(1024 * 1024)
+                    if block != right.read(1024 * 1024):
+                        raise ValueError('Round-trip byte comparison failed')
+                    if not block:
+                        break
+            assets.mkdir(exist_ok=True)
+            shutil.copyfile(paths['old'], assets / 'old.apk')
+            os.replace(patch, assets / 'update.patch')
+            cached = {'fingerprint': fingerprint, 'patchSha256': sha256(assets / 'update.patch'),
+                      'oldSha256': config['old']['sha256'], 'newSha256': config['new']['sha256'],
+                      'patchBytes': (assets / 'update.patch').stat().st_size,
+                      'newBytes': paths['new'].stat().st_size, 'roundTripVerified': True}
+            manifest_file.write_text(json.dumps(cached, indent=2) + '\n')
+    java_out = out / 'java/com/cundong/apkpatch/example/FixtureMetadata.java'
+    java_out.parent.mkdir(parents=True, exist_ok=True)
+    values = {'OLD_APK_SHA256': config['old']['sha256'], 'NEW_APK_SHA256': config['new']['sha256'],
+              'PATCH_APK_SHA256': cached['patchSha256'], 'PACKAGE_NAME': config['packageName'],
+              'NEW_VERSION_NAME': config['new']['versionName']}
+    code = 'package com.cundong.apkpatch.example;\n\n// Generated by prepare_fixtures.py. Do not edit.\nfinal class FixtureMetadata {\n'
+    code += ''.join('    static final String ' + key + ' = ' + json.dumps(value) + ';\n' for key, value in values.items())
+    code += '    static final long NEW_VERSION_CODE = ' + str(config['new']['versionCode']) + 'L;\n}\n'
+    if not java_out.exists() or java_out.read_text() != code:
+        java_out.write_text(code)
+    print('Verified local Taobao fixtures: ' + json.dumps(cached), flush=True)
+
+if __name__ == '__main__':
+    try:
+        main()
+    except (ValueError, OSError, subprocess.CalledProcessError) as error:
+        raise SystemExit('Fixture preparation failed: ' + str(error))

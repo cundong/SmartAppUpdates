@@ -34,3 +34,6 @@ build/
 
 # Mac system files
 .DS_Store
+
+# AGP CMake/ninja 中间产物
+.cxx/

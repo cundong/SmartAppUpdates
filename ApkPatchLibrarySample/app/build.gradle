@@ -1,26 +1,37 @@
-apply plugin: 'com.android.application'
-
+plugins { id 'com.android.application' }
 android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.2"
-
+    namespace 'com.cundong.apkpatch.example'
+    compileSdk 36
+    ndkVersion '29.0.14206865'
     defaultConfig {
-        applicationId "com.example.test2"
-        minSdkVersion 8
-        targetSdkVersion 21
+        applicationId 'com.cundong.apkpatch.example'
+        minSdk 21
+        targetSdk 36
+        versionCode 3
+        versionName '3.0'
     }
-
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
-        }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    sourceSets.main {
+        assets.srcDir layout.buildDirectory.dir('generated/fixtures/assets')
+        java.srcDir layout.buildDirectory.dir('generated/fixtures/java')
     }
 }
-
-dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:23.1.1'
-    compile 'com.android.support:design:23.1.1'
+dependencies { implementation project(':apkPatchLibrary') }
+tasks.register('verifyFixtures', Exec) {
+    group = 'verification'
+    description = 'Generates and verifies the Taobao APK delta and Sample resources.'
+    dependsOn ':server:classes', ':server:compileNative'
+    // Always hash inputs; the preparation script caches only verified content.
+    doFirst {
+        def server = project(':server')
+        commandLine 'python3', rootProject.file('scripts/prepare_fixtures.py'),
+            '--java', new File(System.getProperty('java.home'), 'bin/java'),
+            '--classpath', server.sourceSets.main.runtimeClasspath.asPath,
+            '--library-path', server.layout.buildDirectory.dir('native').get().asFile,
+            '--output', layout.buildDirectory.dir('generated/fixtures').get().asFile
+    }
 }
+tasks.named('preBuild') { dependsOn 'verifyFixtures' }

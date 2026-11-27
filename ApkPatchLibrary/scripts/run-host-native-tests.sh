@@ -10,12 +10,13 @@ mkdir -p "$build_dir"
 
 # Compile each translation unit separately so the legacy bzip2 warning exception
 # cannot hide accidental fallthrough in our parser or regression tests.
+# Strict C99 hides POSIX declarations used by bspatch and bundled bzip2.
 compile_object() {
     source_file=$1
     object_file=$2
     shift 2
     "$compiler" \
-        -std=c99 -D_FILE_OFFSET_BITS=64 \
+        -std=c99 -D_POSIX_C_SOURCE=200809L -D_FILE_OFFSET_BITS=64 \
         -Wall -Wextra -Werror -Wimplicit-fallthrough \
         -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function \
         -I"$project_dir/src/main/cpp" \

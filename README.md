@@ -100,23 +100,23 @@ The old APK must match the version used to generate the patch byte for byte. A s
 
 A fresh checkout builds two revisions of a small project-owned Android app from
 [the fixture source](ApkPatchLibrarySample/fixture). Both use the local Android debug
-signing key. No APK download or preinstalled target app is required.
+signing key. The build generates the patch and checks that applying it reproduces the
+target APK byte for byte. No APK download or preinstalled target app is required.
 
 ```sh
 ./gradlew :app:assembleDebug
 ./gradlew :app:installDebug
 ```
 
-Open **ApkPatchSample**, tap **合成并安装**, and confirm installation when prompted.
-During the build the CLI generates a BSDIFF40 patch, reconstructs the target, and checks
-its SHA-256 and bytes. The Sample bundles only the old APK and patch. On the device
-it reconstructs `rebuilt.apk`, checks its digest, package and version, then opens the installer.
+Open **ApkPatchSample** to see the old and new versions. Tap **合成并安装** to rebuild
+`rebuilt.apk` from the bundled old APK and patch. After checking the SHA-256, package
+name and version, the demo opens the system installer for confirmation. Back in the
+demo, the result shows elapsed time and APK size. Tap **校验详情** for the SHA-256 and output path.
 
 For the **Taobao 10.59.20 → 10.59.40** Demo, place the old APK, the supplied patch and
 the target APK alongside [the case manifest](Apks/taobao-10.59/fixtures.json). The next
-`:app:installDebug` selects this case. The Demo displays both versions, reconstructs
-Taobao on the phone and opens its system installation prompt. The build uses the full
-target APK to verify the result. See [local fixtures](Apks/README.md) for filenames,
+`:app:installDebug` selects this case. The build replays the supplied patch and
+compares the result byte for byte with the target APK. See [local fixtures](Apks/README.md) for filenames,
 explicit case selection and the older Taobao test pair.
 
 ## Testing

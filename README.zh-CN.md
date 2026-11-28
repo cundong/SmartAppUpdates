@@ -98,16 +98,16 @@ if (result == PatchUtils.SUCCESS) {
 
 ## 运行离线示例
 
-首次检出时，构建会从[仓库中的测试应用源码](ApkPatchLibrarySample/fixture)生成 v1、v2 两个 APK，使用同一份本地 Android 调试签名。首次运行无需下载 APK 或预装旧版。
+首次检出时，构建会从[仓库中的测试应用源码](ApkPatchLibrarySample/fixture)生成使用同一调试签名的 v1、v2 两个 APK，再生成补丁，验证合成结果与 v2 逐字节一致。首次运行无需下载 APK 或预装旧版。
 
 ```sh
 ./gradlew :app:assembleDebug
 ./gradlew :app:installDebug
 ```
 
-打开 **ApkPatchSample**，点击“合成并安装”，按系统提示确认安装。构建时，CLI 生成补丁，回放后校验目标 APK 的 SHA-256 并逐字节比较。示例只打包旧 APK 和补丁，在设备上合成 `rebuilt.apk`，校验摘要、包名和版本后打开安装器。
+打开 **ApkPatchSample** 查看新旧版本。点击「合成并安装」，Demo 会用内置的旧 APK 和补丁合成 `rebuilt.apk`，校验 SHA-256、包名和版本后打开系统安装确认页。返回 Demo 可查看合成耗时和文件大小，点「校验详情」可查看 SHA-256 和输出路径。
 
-**淘宝 10.59.20 → 10.59.40** 案例使用已有的旧 APK、补丁和目标 APK。将三个文件放到[案例清单](Apks/taobao-10.59/fixtures.json)所在目录，再运行 `./gradlew :app:installDebug`。Demo 会显示淘宝和两个版本号，点击“合成并安装”即可在手机上还原新版淘宝，并打开系统安装确认页。构建阶段会校验三个文件的 SHA-256，并将回放结果与目标 APK 逐字节比对。文件名、显式选择案例的参数和旧版淘宝样本见[本地样本说明](Apks/README.md)。
+要演示 **淘宝 10.59.20 → 10.59.40**，将旧 APK、补丁和目标 APK 放到[案例清单](Apks/taobao-10.59/fixtures.json)所在目录，再运行 `./gradlew :app:installDebug`。构建时会校验三个文件的 SHA-256，并将补丁合成结果与目标 APK 逐字节比对。文件名和案例选择参数见[本地样本说明](Apks/README.md)。
 
 ## 测试与验证
 

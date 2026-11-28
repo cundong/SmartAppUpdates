@@ -39,6 +39,7 @@ tasks.register('verifyFixtures', Exec) {
     }
     // Always hash inputs; the preparation script caches only verified content.
     doFirst {
+        logger.lifecycle("Sample fixture (-PsampleFixture): ${fixtureMode}")
         def server = project(':server')
         commandLine 'python3', rootProject.file('scripts/prepare_fixtures.py'),
             '--java', new File(System.getProperty('java.home'), 'bin/java'),

@@ -3,6 +3,7 @@ from pathlib import Path
 import re
 import subprocess
 import time
+import uuid
 import xml.etree.ElementTree as ET
 import zipfile
 
@@ -15,16 +16,29 @@ def adb(*args):
     return subprocess.check_output(['adb', *args], timeout=45)
 
 
+def ui_nodes():
+    path = f'/data/local/tmp/smartappupdates-{uuid.uuid4().hex}.xml'
+    try:
+        output = adb('shell', 'uiautomator', 'dump', path)
+        if b'ERROR:' in output:
+            return []
+        return list(ET.fromstring(adb('shell', 'cat', path)).iter('node'))
+    finally:
+        adb('shell', 'rm', '-f', path)
+
+
+def tap_node(node):
+    left, top, right, bottom = map(int, re.findall(r'\d+', node.attrib['bounds']))
+    adb('shell', 'input', 'tap', str((left + right) // 2), str((top + bottom) // 2))
+
+
 def tap_button(resource_ids, packages):
     deadline = time.monotonic() + 60
     while time.monotonic() < deadline:
-        adb('shell', 'uiautomator', 'dump', '/data/local/tmp/smartappupdates-ui.xml')
-        tree = ET.fromstring(adb('shell', 'cat', '/data/local/tmp/smartappupdates-ui.xml'))
-        for node in tree.iter('node'):
+        for node in ui_nodes():
             if (node.get('package') in packages and node.get('resource-id') in resource_ids
                     and node.get('enabled') == 'true'):
-                left, top, right, bottom = map(int, re.findall(r'\d+', node.attrib['bounds']))
-                adb('shell', 'input', 'tap', str((left + right) // 2), str((top + bottom) // 2))
+                tap_node(node)
                 return
         time.sleep(1)
     raise SystemExit(f'{resource_ids} did not appear in {packages}')

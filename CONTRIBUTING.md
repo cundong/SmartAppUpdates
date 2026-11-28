@@ -7,12 +7,12 @@ Run relevant checks, then `git diff --check`:
 
 ```sh
 ./gradlew :apkPatchLibrary:check :apkPatchLibrary:assembleRelease :server:build
-./gradlew verifyFixtures :app:assembleDebug :app:assembleRelease :app:lintDebug :app:lintRelease
+./gradlew -PsampleFixture=public verifyFixtures :app:assembleDebug :app:assembleRelease :app:lintDebug :app:lintRelease
 ```
 
-Both commands run from public source. For an optional large-APK test, pass
-`-PsampleFixture=taobao` and supply the two local APKs named in `Apks/fixtures.json`. Never commit their
-binaries or generated assets. If intentionally changing the pair, inspect package/version metadata,
+Both commands run from public source. For a local large-APK test, choose the
+[Taobao case](Apks/README.md) matching your files. Keep its APKs and binary patch out of Git.
+If intentionally changing the pair, inspect package/version metadata,
 update the manifest SHA-256 values, regenerate and verify the byte-for-byte round trip.
 GitHub Actions runs the native, CLI, Android library and public Sample checks.
 

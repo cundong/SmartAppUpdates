@@ -113,11 +113,13 @@ Open **ApkPatchSample** to see the old and new versions. Tap **合成并安装**
 name and version, the demo opens the system installer for confirmation. Back in the
 demo, the result shows elapsed time and APK size. Tap **校验详情** for the SHA-256 and output path.
 
-For the **Taobao 10.59.20 → 10.59.40** Demo, place the old APK, the supplied patch and
-the target APK alongside [the case manifest](Apks/taobao-10.59/fixtures.json). The next
-`:app:installDebug` selects this case. The build replays the supplied patch and
-compares the result byte for byte with the target APK. See [local fixtures](Apks/README.md) for filenames,
-explicit case selection and the older Taobao test pair.
+For the **Taobao 10.59.20 → 10.59.40** demo, place `taobao-10.59.20.apk`, `update.patch`
+and `taobao-10.59.40.apk` in `Apks/taobao-10.59/` and run `./gradlew :app:installDebug`.
+Git ignores these three local files. The build packages the old APK as `assets/old.apk`
+and the patch as `assets/update.patch`. It uses the full 10.59.40 APK to verify that the
+reconstructed file matches byte for byte. See [local fixtures](Apks/README.md) for case selection.
+
+<img src="ApkPatchLibrarySample/screenshots/taobao-demo.png" width="280" alt="Android sample showing Taobao versions 10.59.20 and 10.59.40 and the rebuild and install button">
 
 ## Testing
 
@@ -140,6 +142,7 @@ The [CI workflow](.github/workflows/ci.yml) builds and lints the public Sample, 
 emulator upgrade test, and checks native peak RSS while reconstructing a 128 MiB test file.
 To repeat the device test after assembling Debug with `-PsampleFixture=public`, select a test emulator with
 `ANDROID_SERIAL`, put `adb` on PATH, and run `python3 scripts/smoke_sample.py`.
+For Taobao 10.59 on a phone, follow the [reconstruction and installer confirmation check](VALIDATION.md#taobao-1059-on-a-phone).
 
 ## Scope and limitations
 

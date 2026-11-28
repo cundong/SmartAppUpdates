@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="canvas">#F6F5F2</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="ink">#272521</color>
+    <color name="secondary">#605C55</color>
+    <color name="line">#E1DED8</color>
+    <color name="accent">#A63C19</color>
+    <color name="status_bar">@color/ink</color>
 </resources>

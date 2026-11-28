@@ -37,5 +37,15 @@ jobs:
           packages: platform-tools
       - uses: gradle/actions/setup-gradle@v4
       - run: sdkmanager 'platforms;android-36' 'build-tools;35.0.0' 'ndk;29.0.14206865' 'cmake;3.31.6'
-      - run: ./gradlew :apkPatchLibrary:check :apkPatchLibrary:assembleDebug :apkPatchLibrary:assembleRelease --no-daemon
-      # Proprietary Taobao APKs stay local; no Sample artifact is uploaded.
+      - run: ./gradlew :apkPatchLibrary:check :apkPatchLibrary:assembleDebug :apkPatchLibrary:assembleRelease :app:assembleDebug :app:lintDebug --no-daemon
+      - name: Enable KVM for the emulator
+        run: sudo setfacl -m "u:$(id -un):rw" /dev/kvm
+      - name: Verify on-device Sample reconstruction
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          cores: 2
+          ram-size: 1536M
+          script: python3 scripts/smoke_sample.py

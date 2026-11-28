@@ -3,11 +3,15 @@ package com.cundong.cli;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.LinkOption;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -57,7 +61,7 @@ public final class ApkPatchCli {
             return EXIT_USAGE;
         }
 
-        Path temporaryOutput = null;
+        Path stagingDirectory = null;
         try {
             Path oldFile = resolveInput("old", args[1]);
             Path secondInput = resolveInput(
@@ -72,7 +76,14 @@ public final class ApkPatchCli {
                 throw new CliException(EXIT_OUTPUT, "Output path must not overwrite an input file: " + output);
             }
 
-            temporaryOutput = createTemporaryOutput(output);
+            Path temporaryOutput;
+            try {
+                stagingDirectory = Files.createTempDirectory(output.getParent(), ".apk-patcher-");
+                temporaryOutput = Files.createTempFile(stagingDirectory, "result-", ".tmp");
+            } catch (IOException | SecurityException e) {
+                throw new CliException(EXIT_OUTPUT,
+                        "Cannot stage output next to " + output + " (" + e.getMessage() + ")");
+            }
             Path newFile = command == Command.DIFF ? secondInput : temporaryOutput;
             Path patchFile = command == Command.DIFF ? temporaryOutput : secondInput;
 
@@ -80,7 +91,7 @@ public final class ApkPatchCli {
             int workerExit;
             try {
                 workerExit = runNativeWorker(
-                        command, oldFile, newFile, patchFile, temporaryOutput, err, timeoutSeconds);
+                        command, oldFile, newFile, patchFile, stagingDirectory, err, timeoutSeconds);
             } catch (TimeoutException e) {
                 err.println("Native worker exceeded " + timeoutSeconds + " seconds and was terminated");
                 return EXIT_TIMEOUT;
@@ -126,7 +137,7 @@ public final class ApkPatchCli {
             err.println("I/O validation failed: " + e.getMessage());
             return EXIT_INPUT;
         } finally {
-            deleteTemporaryOutput(temporaryOutput, err);
+            deleteStagingDirectory(stagingDirectory, err);
         }
     }
 
@@ -184,18 +195,9 @@ public final class ApkPatchCli {
         return realParent.resolve(fileName).normalize();
     }
 
-    private static Path createTemporaryOutput(Path output) throws CliException {
-        try {
-            return Files.createTempFile(output.getParent(), ".apk-patcher-", ".tmp");
-        } catch (IOException | SecurityException e) {
-            throw new CliException(EXIT_OUTPUT,
-                    "Cannot create temporary output next to " + output + " (" + e.getMessage() + ")");
-        }
-    }
-
     private static void publishOutput(Path temporaryOutput, Path output) throws CliException {
         try {
-            /* 同目录 hard link 是原子发布：目标已存在时绝不覆盖，同时不会暴露半成品。 */
+            /* 同文件系统 hard link 是原子发布：目标已存在时绝不覆盖，同时不会暴露半成品。 */
             Files.createLink(output, temporaryOutput);
         } catch (FileAlreadyExistsException e) {
             throw new CliException(EXIT_OUTPUT,
@@ -207,7 +209,7 @@ public final class ApkPatchCli {
     }
 
     private static int runNativeWorker(Command command, Path oldFile, Path newFile, Path patchFile,
-            Path temporaryOutput, PrintStream err, long timeoutSeconds)
+            Path stagingDirectory, PrintStream err, long timeoutSeconds)
             throws IOException, InterruptedException, TimeoutException {
         String javaExecutable = Paths.get(System.getProperty("java.home"), "bin", "java").toString();
         String classPath = System.getProperty("java.class.path");
@@ -216,6 +218,7 @@ public final class ApkPatchCli {
         List<String> processArgs = new ArrayList<>();
         processArgs.add(javaExecutable);
         processArgs.add("-Djava.library.path=" + libraryPath);
+        processArgs.add("-Djava.io.tmpdir=" + stagingDirectory);
         processArgs.add("-cp");
         processArgs.add(classPath);
         processArgs.add(NativeWorker.class.getName());
@@ -229,7 +232,7 @@ public final class ApkPatchCli {
                 .start();
         Thread shutdownHook = new Thread(() -> {
             stopWorker(process);
-            deleteTemporaryOutput(temporaryOutput, err);
+            deleteStagingDirectory(stagingDirectory, err);
         }, "apk-patcher-worker-cleanup");
         boolean hookRegistered = false;
         try {
@@ -286,14 +289,29 @@ public final class ApkPatchCli {
         }
     }
 
-    private static void deleteTemporaryOutput(Path output, PrintStream err) {
-        if (output == null) {
-            return;
-        }
+    private static void deleteStagingDirectory(Path directory, PrintStream err) {
+        if (directory == null) return;
         try {
-            Files.deleteIfExists(output);
+            // The worker is reaped first. Walk only this invocation's directory, without
+            // following links, including native partial output and extracted JNI libraries.
+            Files.walkFileTree(directory, new SimpleFileVisitor<Path>() {
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attributes) throws IOException {
+                    Files.deleteIfExists(file);
+                    return FileVisitResult.CONTINUE;
+                }
+
+                @Override
+                public FileVisitResult postVisitDirectory(Path dir, IOException error) throws IOException {
+                    if (error != null) throw error;
+                    Files.deleteIfExists(dir);
+                    return FileVisitResult.CONTINUE;
+                }
+            });
+        } catch (NoSuchFileException ignored) {
+            // The shutdown hook and the caller can both finish cleanup.
         } catch (IOException | SecurityException e) {
-            err.println("Warning: failed to remove temporary output " + output + ": " + e.getMessage());
+            err.println("Warning: failed to remove staging directory " + directory + ": " + e.getMessage());
         }
     }
 

@@ -1,9 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- 纯 framework 主题，零第三方依赖（不用 appcompat） -->
     <style name="AppTheme" parent="android:Theme.Material.Light.NoActionBar">
-        <item name="android:colorPrimary">@color/colorPrimary</item>
-        <item name="android:colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="android:colorAccent">@color/colorAccent</item>
+        <item name="android:colorAccent">@color/accent</item>
+        <item name="android:windowBackground">@color/canvas</item>
+        <item name="android:statusBarColor">@color/status_bar</item>
+        <item name="android:windowLightStatusBar" xmlns:tools="http://schemas.android.com/tools" tools:targetApi="m">true</item>
+        <item name="android:navigationBarColor">@color/ink</item>
+    </style>
+
+    <style name="VersionLabel">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/secondary</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="VersionNumber" parent="VersionLabel">
+        <item name="android:layout_marginTop">4dp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">@color/ink</item>
+        <item name="android:textSize">22sp</item>
+    </style>
+
+    <style name="TextAction" parent="@android:style/Widget.Material.Light.Button.Borderless">
+        <item name="android:textAllCaps">false</item>
+        <item name="android:minHeight">48dp</item>
+        <item name="android:minWidth">48dp</item>
+        <item name="android:textColor">@color/secondary</item>
     </style>
 </resources>

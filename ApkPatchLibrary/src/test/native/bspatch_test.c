@@ -186,7 +186,7 @@ static void expect_corrupt_and_preserved(const char *old_path, const char *outpu
 			"corrupt patch preserves existing output");
 }
 
-int main(void) {
+int main(int argc, char **argv) {
 	char directory[] = "/tmp/apkpatch-test.XXXXXX";
 	char old_path[256], output_path[256], patch_path[256], missing_path[256];
 	static const uint8_t old_bytes[] = "abc";
@@ -201,6 +201,10 @@ int main(void) {
 	uint8_t position_diff[] = {(uint8_t)('x' - 'b')};
 	uint8_t *mutated;
 	int result;
+
+	/* Run the same decoder in an isolated process for the RSS regression. */
+	if (argc == 4)
+		return bspatch(argv[1], argv[2], argv[3]) == BSPATCH_SUCCESS ? 0 : EXIT_FAILURE;
 
 	CHECK(mkdtemp(directory) != NULL, "create test directory");
 	if (failures != 0)

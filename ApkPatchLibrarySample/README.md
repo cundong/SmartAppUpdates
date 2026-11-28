@@ -1,21 +1,13 @@
-# Taobao offline Sample
+# Offline Android Sample
 
-From the repository root run `./gradlew verifyFixtures :app:assembleDebug :app:lintDebug`.
-The two local inputs are `Apks/淘宝v10.65.10.apk` and `Apks/淘宝v10.65.20.apk`.
-`Apks/fixtures.json` is authoritative. No Git LFS or hand-copied assets are used.
+Run `./gradlew :app:installDebug` from the repository root and open **ApkPatchSample**.
+The home screen shows the old and new versions. Tap **合成并安装** to reconstruct the
+target APK and open the system installer. Back in the demo, the result shows elapsed
+time and APK size. Tap **校验详情** to see the output path and SHA-256.
 
-`verifyFixtures` depends on the current server build, validates input hashes, generates BSDIFF40,
-reconstructs the exact new APK using the shared client code and compares bytes plus SHA-256.
-It writes `old.apk`, `update.patch`, FixtureMetadata.java and verified.json under
-`app/build/generated/fixtures/`. Failed preparation prevents the app build.
+On a fresh checkout the build signs two revisions of the [fixture app](fixture) with the local debug key,
+generates the patch and verifies the reconstructed bytes. The fixture app has no launcher
+activity. The Sample checks the APK digest, package and version before requesting installation.
 
-On device: copies inputs, verifies hashes, reconstructs `taobao-10.65.20.apk`, verifies its
-hash/package/version and opens the system installer. Native work runs off the UI thread.
-Inputs need not be installed first. Installation requires confirmation and compatible device/signing/version state.
-Runtime output is in the app's private external files directory (internal storage fallback).
-
-Target SDK 36, min SDK 21; the library supplies armeabi-v7a, arm64-v8a and x86_64.
-Build success is not a substitute for device installation testing.
-
-构建读取 `build/generated/fixtures/current/` 指向的完整快照。直接 assets/java 路径为兼容符号链接。
-可通过根 Gradle 参数 `-PfixtureTimeoutSeconds=1200` 与 `-PfixtureLockTimeoutSeconds=1200` 设置操作和锁等待超时。
+With the three local inputs for [Taobao 10.59.20 → 10.59.40](../Apks/README.md), the same command installs the Taobao Demo. It reuses the supplied patch. The older pinned pair remains available with `-PsampleFixture=taobao`. For slow hosts, the Gradle properties
+`fixtureTimeoutSeconds` and `fixtureLockTimeoutSeconds` control generation and lock timeouts.

@@ -1,4 +1,14 @@
 plugins { id 'com.android.application' }
+def taobaoCase = rootProject.file('Apks/taobao-10.59')
+def hasTaobaoInputs = !fileTree(taobaoCase) { include '*.apk', '*.patch' }.isEmpty()
+def fixtureMode = providers.gradleProperty('sampleFixture').getOrElse(hasTaobaoInputs ? 'taobao-10.59' : 'public')
+def outputDirs = [public: 'sample-fixtures', taobao: 'fixtures', 'taobao-10.59': 'taobao-10.59']
+if (!outputDirs.containsKey(fixtureMode)) {
+    throw new GradleException("Unknown sampleFixture: ${fixtureMode}. Choose from ${outputDirs.keySet()}")
+}
+def publicFixtures = fixtureMode == 'public'
+def generatedFixtures = layout.buildDirectory.dir("generated/${outputDirs[fixtureMode]}")
+
 android {
     namespace 'com.cundong.apkpatch.example'
     compileSdk 36
@@ -15,15 +25,18 @@ android {
         targetCompatibility JavaVersion.VERSION_17
     }
     sourceSets.main {
-        assets.srcDir layout.buildDirectory.dir('generated/fixtures/current/assets')
-        java.srcDir layout.buildDirectory.dir('generated/fixtures/current/java')
+        assets.srcDir generatedFixtures.map { it.dir('current/assets') }
+        java.srcDir generatedFixtures.map { it.dir('current/java') }
     }
 }
 dependencies { implementation project(':apkPatchLibrary') }
 tasks.register('verifyFixtures', Exec) {
     group = 'verification'
-    description = 'Generates and verifies the Taobao APK delta and Sample resources.'
+    description = 'Generates and verifies the selected APK delta and Sample resources.'
     dependsOn ':server:classes', ':server:compileNative'
+    if (publicFixtures) {
+        dependsOn ':sampleFixture:assembleBaselineDebug', ':sampleFixture:assembleUpdatedDebug'
+    }
     // Always hash inputs; the preparation script caches only verified content.
     doFirst {
         def server = project(':server')
@@ -31,9 +44,14 @@ tasks.register('verifyFixtures', Exec) {
             '--java', new File(System.getProperty('java.home'), 'bin/java'),
             '--classpath', server.sourceSets.main.runtimeClasspath.asPath,
             '--library-path', server.layout.buildDirectory.dir('native').get().asFile,
-            '--output', layout.buildDirectory.dir('generated/fixtures').get().asFile,
+            '--output', generatedFixtures.get().asFile,
             '--timeout-seconds', providers.gradleProperty('fixtureTimeoutSeconds').getOrElse('900'),
             '--lock-timeout-seconds', providers.gradleProperty('fixtureLockTimeoutSeconds').getOrElse('900')
+        if (publicFixtures) {
+            args '--built-apks', project(':sampleFixture').layout.buildDirectory.dir('outputs/apk').get().asFile
+        } else if (fixtureMode == 'taobao-10.59') {
+            args '--fixture-dir', taobaoCase
+        }
     }
 }
 tasks.named('preBuild') { dependsOn 'verifyFixtures' }

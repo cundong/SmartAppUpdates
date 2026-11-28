@@ -98,7 +98,7 @@ public final class ApkUtils {
                 || !FixtureMetadata.NEW_VERSION_NAME.equals(archiveInfo.versionName)
                 || (Build.VERSION.SDK_INT >= 28 ? archiveInfo.getLongVersionCode() : archiveInfo.versionCode)
                     != FixtureMetadata.NEW_VERSION_CODE) {
-            throw new IOException("合成 APK 的包名或版本与淘宝测试输入不一致");
+            throw new IOException("合成 APK 的包名或版本与测试输入不一致");
         }
 
         PackageInstaller installer = context.getPackageManager().getPackageInstaller();

@@ -98,34 +98,16 @@ if (result == PatchUtils.SUCCESS) {
 
 ## 运行离线示例
 
-示例使用 [Apks/fixtures.json](Apks/fixtures.json) 固定的 APK 样本：
-
-| 角色 | 本地文件 | 包名 | 版本码 |
-| --- | --- | --- | ---: |
-| 旧版 | `Apks/淘宝v10.65.10.apk` | `com.taobao.taobao` | 855 |
-| 新版 | `Apks/淘宝v10.65.20.apk` | `com.taobao.taobao` | 856 |
-
-仓库**不分发这些第三方 APK**。构建示例前，需要在本地提供与配置匹配的文件。APK 已由 Git 忽略，无需配置 Git LFS。单独构建合成库和 CLI 不需要这些文件。
+首次检出时，构建会从[仓库中的测试应用源码](ApkPatchLibrarySample/fixture)生成使用同一调试签名的 v1、v2 两个 APK，再生成补丁，验证合成结果与 v2 逐字节一致。首次运行无需下载 APK 或预装旧版。
 
 ```sh
-./gradlew verifyFixtures :app:assembleDebug :app:lintDebug
-# 安装到已连接并授权 USB 调试的 Android 设备：
+./gradlew :app:assembleDebug
 ./gradlew :app:installDebug
 ```
 
-示例构建会自动准备资源：先校验两个输入文件的 SHA-256，再生成 `update.patch`，使用共享的补丁实现合成目标 APK，最后校验 SHA-256 并逐字节比较。任一校验失败都会阻止构建。
+打开 **ApkPatchSample** 查看新旧版本。点击「合成并安装」，Demo 会用内置的旧 APK 和补丁合成 `rebuilt.apk`，校验 SHA-256、包名和版本后打开系统安装确认页。返回 Demo 可查看合成耗时和文件大小，点「校验详情」可查看 SHA-256 和输出路径。
 
-示例 assets 只打包 `old.apk` 和 `update.patch`；完整新版 APK 用于构建阶段的对照验证。真机运行时，应用校验输入、合成 `taobao-10.65.20.apk`、检查摘要、包名和版本，然后打开系统安装界面。安装需要用户确认，并受 Android 签名和版本规则约束。
-
-生成资源位于 `ApkPatchLibrarySample/app/build/generated/fixtures/current/`，请勿手工修改。生成过程使用有超时限制的文件锁，并以原子方式发布完整、已验证的结果；失败时保留上一份结果。缓存检查覆盖输入文件、生成脚本、构建配置及编译产物。
-
-主机性能较低时，可适当增加超时：
-
-```sh
-./gradlew verifyFixtures -PfixtureTimeoutSeconds=1200 -PfixtureLockTimeoutSeconds=1200
-```
-
-操作超时与锁等待超时默认均为 900 秒。首次生成可能耗时数分钟，并占用较多内存。`:app:clean` 会清理历史生成结果，请勿在其他构建运行期间执行清理。
+要演示 **淘宝 10.59.20 → 10.59.40**，将旧 APK、补丁和目标 APK 放到[案例清单](Apks/taobao-10.59/fixtures.json)所在目录，再运行 `./gradlew :app:installDebug`。构建时会校验三个文件的 SHA-256，并将补丁合成结果与目标 APK 逐字节比对。文件名和案例选择参数见[本地样本说明](Apks/README.md)。
 
 ## 测试与验证
 
@@ -137,21 +119,21 @@ python3 scripts/check_repository.py
 git diff --check
 ```
 
-包含示例的完整本地检查与构建需要两个 APK：
+包括公开示例的完整检查与构建：
 
 ```sh
 ./gradlew check build
 ./gradlew :app:assembleRelease :app:lintRelease
 ```
 
-[GitHub Actions 工作流](.github/workflows/ci.yml) 覆盖原生代码与 JNI 回归、资源生成流程、CLI 差分合成闭环与分发包迁移测试，以及 Android 库构建。CI 不下载第三方 APK，也不执行真实 APK 的示例流程。小型合成数据的边界测试与真实 APK 验证相互补充。
+[CI 工作流](.github/workflows/ci.yml)构建公开示例、运行 Lint，在模拟器上验证从 v1 到 v2 的升级，并检查合成 128 MiB 文件时的原生进程峰值内存。要在本地复验，使用 `-PsampleFixture=public` 构建 Debug 版，将 `adb` 加入 PATH，用 `ANDROID_SERIAL` 指定测试模拟器，再运行 `python3 scripts/smoke_sample.py`。
 
 ## 适用范围与限制
 
 - 支持单个 APK 的合成，当前不包含 split APK 安装或 Android App Bundle 分发方案。
 - 不提供更新托管、下载调度、更新元数据签名或回滚策略。生产接入需要自行建立可信的更新分发机制；示例中的固定摘要不能替代元数据认证。
 - 合成与安装是两个独立步骤。即使 APK 已正确还原，Android 仍可能因设备兼容性、签名或版本限制拒绝安装。
-- 面向 32 位 ABI 时，文件应小于 2 GB。差分生成所需内存可能显著高于输入文件大小。
+- 面向 32 位 ABI 时，文件应小于 2 GB。合成每次处理 64 KiB 数据，使用 128 KiB 工作缓冲区和 bzip2 解压状态。差分生成所需内存可能显著高于输入文件大小。
 
 ## 参与贡献
 

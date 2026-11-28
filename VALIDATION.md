@@ -55,3 +55,27 @@ were stopped at their request. An independent digest check of the on-device outp
 
 GitHub Actions is configured for public-source checks. These local results do not establish a
 remote CI result. Third-party APKs and generated binaries are excluded from Git.
+
+## Public Sample and streaming reconstruction (2026-11-28)
+
+The default Sample was built from source with JDK 17. On an Android 14 arm64 emulator
+configured with two cores and 1536 MiB RAM (guest MemTotal 1,511,076 KiB), the Sample
+updated the project fixture from v1 to v2 via the system installer. The installed APK
+matched the locally built v2 byte for byte.
+
+The Android native comparison used two local APKs of 73,461,388 and 91,323,319 bytes.
+A single 71,845,578-byte BSDIFF40 patch was replayed in fresh standalone arm64 processes
+using the same NDK, optimization flags and emulator. Measurements use process peak RSS
+from getrusage and elapsed time through file synchronization. Each output matched the
+target SHA-256. These measurements exclude the Sample UI, Java runtime and installer.
+
+| Run order | Decoder | Peak RSS (KiB) | Time (s) |
+| --- | --- | ---: | ---: |
+| 1 | Previous | 110192 | 10.842 |
+| 2 | Streaming | 12324 | 7.055 |
+| 3 | Streaming | 12156 | 5.777 |
+| 4 | Previous | 109924 | 7.388 |
+
+The host regression generates its own 128 MiB input, checks the output SHA-256, and
+requires peak decoder RSS below 64 MiB. Run it with
+`sh ApkPatchLibrary/scripts/run-host-native-tests.sh`.

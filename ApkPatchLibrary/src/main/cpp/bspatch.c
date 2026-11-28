@@ -58,6 +58,7 @@
 
 #define BSDIFF_HEADER_SIZE 32
 #define BSDIFF_INT_SIZE 8
+#define BUFFER_SIZE (64 * 1024)
 
 /* bsdiff 的整数编码是 63 位绝对值 + 最高位符号位。 */
 static int64_t offtin(const uint8_t *buf) {
@@ -78,20 +79,16 @@ static int add_i64(int64_t left, int64_t right, int64_t *result) {
 	return 1;
 }
 
-static int read_fully(int fd, uint8_t *buffer, size_t length) {
-	size_t offset = 0;
-
-	while (offset < length) {
-		size_t remaining = length - offset;
-		size_t request = remaining > (size_t)SSIZE_MAX ? (size_t)SSIZE_MAX : remaining;
-		ssize_t count = read(fd, buffer + offset, request);
-		if (count > 0) {
-			offset += (size_t)count;
-			continue;
-		}
+static int pread_fully(int fd, uint8_t *buffer, size_t length, off_t position) {
+	while (length > 0) {
+		ssize_t count = pread(fd, buffer, length, position);
 		if (count < 0 && errno == EINTR)
 			continue;
-		return 0;
+		if (count <= 0)
+			return 0;
+		buffer += count;
+		length -= (size_t)count;
+		position += count;
 	}
 	return 1;
 }
@@ -147,6 +144,39 @@ static int bz_read_exact(BZFILE *stream, int *bzerror, int *stream_ended,
 		}
 	}
 	return 1;
+}
+
+/* For the diff stream, only the intersection with the old file contributes
+ * bytes. Positions outside it contribute zero, as specified by BSDIFF40.
+ * The caller checks old_pos + length before entering this loop. */
+static int write_segment(BZFILE *stream, int *bzerror, int *ended,
+		int64_t length, int output_fd, uint8_t *buffer,
+		int old_fd, int64_t old_pos, int64_t old_size, uint8_t *old_buffer) {
+	while (length > 0) {
+		size_t chunk = length > BUFFER_SIZE ? BUFFER_SIZE : (size_t)length;
+		if (!bz_read_exact(stream, bzerror, ended, buffer, chunk))
+			return BSPATCH_ERR_CORRUPT_PATCH;
+
+		if (old_fd >= 0) {
+			int64_t begin = old_pos < 0 ? 0 : old_pos;
+			int64_t end = old_pos + (int64_t)chunk;
+			if (end > old_size)
+				end = old_size;
+			if (begin < end) {
+				size_t count = (size_t)(end - begin);
+				size_t offset = (size_t)(begin - old_pos);
+				if (!pread_fully(old_fd, old_buffer, count, (off_t)begin))
+					return BSPATCH_ERR_READ_OLD;
+				for (size_t i = 0; i < count; ++i)
+					buffer[offset + i] += old_buffer[i];
+			}
+			old_pos += (int64_t)chunk;
+		}
+		if (!write_fully(output_fd, buffer, chunk))
+			return BSPATCH_ERR_WRITE_NEW;
+		length -= (int64_t)chunk;
+	}
+	return BSPATCH_SUCCESS;
 }
 
 /*
@@ -220,9 +250,8 @@ int bspatch(const char *oldfile, const char *newfile, const char *patchfile) {
 	struct stat patch_stat, old_stat;
 	int64_t patch_size, ctrl_length, diff_length, new_size64;
 	int64_t diff_offset, extra_offset;
-	size_t old_size, new_size;
 	uint8_t header[BSDIFF_HEADER_SIZE], ctrl_buffer[BSDIFF_INT_SIZE];
-	uint8_t *old_data = NULL, *new_data = NULL;
+	uint8_t *buffers = NULL;
 	int64_t old_pos = 0, new_pos = 0, ctrl[3];
 	char *temporary_path = NULL;
 	int temporary_created = 0;
@@ -261,11 +290,10 @@ int bspatch(const char *oldfile, const char *newfile, const char *patchfile) {
 		goto cleanup;
 	}
 	extra_offset = diff_offset + diff_length;
-	if ((uint64_t)new_size64 > (uint64_t)SIZE_MAX) {
+	if ((int64_t)(off_t)new_size64 != new_size64) {
 		result = BSPATCH_ERR_NO_MEMORY;
 		goto cleanup;
 	}
-	new_size = (size_t)new_size64;
 
 	result = open_bz_stream(patchfile, BSDIFF_HEADER_SIZE, &patch_stat,
 			&cpf, &cpfbz2, &cbz2err);
@@ -286,29 +314,35 @@ int bspatch(const char *oldfile, const char *newfile, const char *patchfile) {
 		goto cleanup;
 	}
 	if (fstat(old_fd, &old_stat) != 0 || old_stat.st_size < 0 ||
-			(uint64_t)old_stat.st_size > (uint64_t)SIZE_MAX ||
 			lseek(old_fd, 0, SEEK_SET) < 0) {
 		result = BSPATCH_ERR_READ_OLD;
 		goto cleanup;
 	}
-	old_size = (size_t)old_stat.st_size;
-	old_data = (uint8_t *)malloc(old_size == 0 ? 1 : old_size);
-	if (old_data == NULL) {
+	buffers = malloc(2 * BUFFER_SIZE);
+	if (buffers == NULL) {
 		result = BSPATCH_ERR_NO_MEMORY;
 		goto cleanup;
 	}
-	if (!read_fully(old_fd, old_data, old_size)) {
-		result = BSPATCH_ERR_READ_OLD;
+	result = stat_output_alias(newfile, &old_stat, &patch_stat);
+	if (result != BSPATCH_SUCCESS)
 		goto cleanup;
-	}
-	close(old_fd);
-	old_fd = -1;
-
-	new_data = (uint8_t *)malloc(new_size == 0 ? 1 : new_size);
-	if (new_data == NULL) {
+	if (strlen(newfile) > SIZE_MAX - sizeof(".tmp.XXXXXX")) {
 		result = BSPATCH_ERR_NO_MEMORY;
 		goto cleanup;
 	}
+	temporary_path = (char *)malloc(strlen(newfile) + sizeof(".tmp.XXXXXX"));
+	if (temporary_path == NULL) {
+		result = BSPATCH_ERR_NO_MEMORY;
+		goto cleanup;
+	}
+	snprintf(temporary_path, strlen(newfile) + sizeof(".tmp.XXXXXX"),
+			"%s.tmp.XXXXXX", newfile);
+	output_fd = mkstemp(temporary_path);
+	if (output_fd < 0) {
+		result = BSPATCH_ERR_OPEN_NEW;
+		goto cleanup;
+	}
+	temporary_created = 1;
 
 	while (new_pos < new_size64) {
 		int64_t old_after_diff;
@@ -334,26 +368,21 @@ int bspatch(const char *oldfile, const char *newfile, const char *patchfile) {
 			result = BSPATCH_ERR_CORRUPT_PATCH;
 			goto cleanup;
 		}
-		if (!bz_read_exact(dpfbz2, &dbz2err, &diff_ended,
-				new_data + (size_t)new_pos, (size_t)ctrl[0])) {
-			result = BSPATCH_ERR_CORRUPT_PATCH;
+		result = write_segment(dpfbz2, &dbz2err, &diff_ended, ctrl[0],
+				output_fd, buffers, old_fd, old_pos, old_stat.st_size, buffers + BUFFER_SIZE);
+		if (result != BSPATCH_SUCCESS)
 			goto cleanup;
-		}
-
-		for (int64_t i = 0; i < ctrl[0]; ++i) {
-			int64_t source_pos = old_pos + i;
-			if (source_pos >= 0 && (uint64_t)source_pos < (uint64_t)old_size)
-				new_data[(size_t)(new_pos + i)] += old_data[(size_t)source_pos];
-		}
 		new_pos += ctrl[0];
 		old_pos = old_after_diff;
 
-		if (ctrl[1] > new_size64 - new_pos ||
-				!bz_read_exact(epfbz2, &ebz2err, &extra_ended,
-					new_data + (size_t)new_pos, (size_t)ctrl[1])) {
+		if (ctrl[1] > new_size64 - new_pos) {
 			result = BSPATCH_ERR_CORRUPT_PATCH;
 			goto cleanup;
 		}
+		result = write_segment(epfbz2, &ebz2err, &extra_ended, ctrl[1],
+				output_fd, buffers, -1, 0, 0, NULL);
+		if (result != BSPATCH_SUCCESS)
+			goto cleanup;
 		new_pos += ctrl[1];
 		if (!add_i64(old_pos, ctrl[2], &old_pos)) {
 			result = BSPATCH_ERR_CORRUPT_PATCH;
@@ -368,27 +397,7 @@ int bspatch(const char *oldfile, const char *newfile, const char *patchfile) {
 		goto cleanup;
 	}
 
-	result = stat_output_alias(newfile, &old_stat, &patch_stat);
-	if (result != BSPATCH_SUCCESS)
-		goto cleanup;
-	if (strlen(newfile) > SIZE_MAX - sizeof(".tmp.XXXXXX")) {
-		result = BSPATCH_ERR_NO_MEMORY;
-		goto cleanup;
-	}
-	temporary_path = (char *)malloc(strlen(newfile) + sizeof(".tmp.XXXXXX"));
-	if (temporary_path == NULL) {
-		result = BSPATCH_ERR_NO_MEMORY;
-		goto cleanup;
-	}
-	snprintf(temporary_path, strlen(newfile) + sizeof(".tmp.XXXXXX"),
-			"%s.tmp.XXXXXX", newfile);
-	output_fd = mkstemp(temporary_path);
-	if (output_fd < 0) {
-		result = BSPATCH_ERR_OPEN_NEW;
-		goto cleanup;
-	}
-	temporary_created = 1;
-	if (!write_fully(output_fd, new_data, new_size) || fsync(output_fd) != 0) {
+	if (fsync(output_fd) != 0) {
 		result = BSPATCH_ERR_WRITE_NEW;
 		goto cleanup;
 	}
@@ -421,7 +430,6 @@ cleanup:
 	if (output_fd >= 0) close(output_fd);
 	if (temporary_created && temporary_path != NULL) unlink(temporary_path);
 	free(temporary_path);
-	free(new_data);
-	free(old_data);
+	free(buffers);
 	return result;
 }

@@ -1,6 +1,7 @@
 package com.cundong.apkpatch.example;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
@@ -49,6 +50,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private static final String TAG = "MainActivity";
     private static final int REQUEST_UNKNOWN_APP_SOURCES = 1001;
     private static final String STATE_PENDING_INSTALL_PATH = "pending_install_path";
+    private static final String STATE_DETAILS = "result_details";
+    private static final String STATE_RESULT = "result";
+    private static final String STATE_INSTALL_STATUS = "install_status";
     /** 防止 Activity 重建后两个任务并发覆盖同一组 old/patch/new 文件。 */
     private static final AtomicBoolean PATCH_IN_PROGRESS = new AtomicBoolean(false);
 
@@ -56,6 +60,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private final Handler mMainHandler = new Handler(Looper.getMainLooper());
 
     private Button mStartButton;
+    private Button mDetailsButton;
+    private TextView mInstallStatus;
+    private String mDetails;
     private TextView mResultView;
     private long mBeginTime;
     private String mPendingInstallPath;
@@ -79,14 +86,33 @@ public class MainActivity extends Activity implements View.OnClickListener {
         });
         content.requestApplyInsets();
 
-        mResultView = findViewById(R.id.result_view);
+        TextView fixture = findViewById(R.id.fixture_name);
+        TextView oldVersion = findViewById(R.id.old_version);
+        TextView newVersion = findViewById(R.id.new_version);
+        fixture.setText(FixtureMetadata.DISPLAY_NAME);
+        oldVersion.setText(FixtureMetadata.OLD_VERSION_NAME);
+        newVersion.setText(FixtureMetadata.NEW_VERSION_NAME);
 
+        mResultView = findViewById(R.id.result_view);
+        mInstallStatus = findViewById(R.id.install_status);
         mStartButton = findViewById(R.id.start_btn);
-        Button githubButton = findViewById(R.id.github_btn);
         mStartButton.setOnClickListener(this);
-        githubButton.setOnClickListener(this);
+        findViewById(R.id.github_btn).setOnClickListener(this);
+        mDetailsButton = findViewById(R.id.details_btn);
+        mDetailsButton.setOnClickListener(view -> {
+            AlertDialog dialog = new AlertDialog.Builder(this)
+                    .setTitle(R.string.demo_details)
+                    .setMessage(mDetails)
+                    .setPositiveButton(android.R.string.ok, null)
+                    .show();
+            TextView message = dialog.findViewById(android.R.id.message);
+            message.setTextIsSelectable(true);
+        });
 
         if (savedInstanceState != null) {
+            setDetails(savedInstanceState.getString(STATE_DETAILS));
+            mResultView.setText(savedInstanceState.getCharSequence(STATE_RESULT));
+            mInstallStatus.setText(savedInstanceState.getCharSequence(STATE_INSTALL_STATUS));
             mPendingInstallPath = savedInstanceState.getString(STATE_PENDING_INSTALL_PATH);
             if (mPendingInstallPath != null) {
                 InstallResultReceiver.restoreInstallInProgress();
@@ -99,6 +125,11 @@ public class MainActivity extends Activity implements View.OnClickListener {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putString(STATE_PENDING_INSTALL_PATH, mPendingInstallPath);
+        if (mDetails != null || mStartButton.isEnabled()) {
+            outState.putString(STATE_DETAILS, mDetails);
+            outState.putCharSequence(STATE_RESULT, mResultView.getText());
+            outState.putCharSequence(STATE_INSTALL_STATUS, mInstallStatus.getText());
+        }
     }
 
     @Override
@@ -143,6 +174,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 return;
             }
             mStartButton.setEnabled(false);
+            setDetails(null);
+            mInstallStatus.setText(null);
             mResultView.setText(R.string.status_copying_assets);
             mBeginTime = System.currentTimeMillis();
             try {
@@ -151,7 +184,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 PATCH_IN_PROGRESS.set(false);
                 mStartButton.setEnabled(true);
                 Log.e(TAG, "patch executor rejected task", e);
-                showToast(getString(R.string.toast_patch_start_failure));
+                mResultView.setText(R.string.toast_patch_start_failure);
             }
         } else if (v.getId() == R.id.github_btn) {
             Intent intent = new Intent(Intent.ACTION_VIEW,
@@ -237,7 +270,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
             return LocalPatchResult.failure("native 合成失败，错误码：" + patchResult);
         }
 
-        // 4. 校验输出。只有与 Apks/淘宝v10.65.20.apk 的基准摘要一致才算演示成功。
+        // 4. 校验输出。只有与 目标 APK 的基准摘要一致才算演示成功。
         publishStatus(R.string.status_verifying_output);
         try {
             String newSha256 = HashUtils.sha256(newApkFile);
@@ -255,22 +288,23 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     /** 主线程处理合成结果 */
     private void onPatchResult(LocalPatchResult result) {
-        long elapsed = System.currentTimeMillis() - mBeginTime;
+        double seconds = (System.currentTimeMillis() - mBeginTime) / 1000.0;
 
         if (result.success) {
-            String text = getString(R.string.result_success,
-                    elapsed,
-                    formatMiB(result.outputFile.length()),
-                    result.outputFile.getAbsolutePath(),
-                    result.sha256);
-            mResultView.setText(text);
-            showToast(getString(R.string.toast_patch_success));
+            mResultView.setText(getString(R.string.result_success,
+                    seconds, formatMiB(result.outputFile.length())));
+            setDetails(getString(R.string.result_details,
+                    result.sha256, result.outputFile.getAbsolutePath()));
             requestSystemInstall(result.outputFile);
         } else {
             mStartButton.setEnabled(true);
-            mResultView.setText(getString(R.string.result_failure, elapsed, result.message));
-            showToast(getString(R.string.toast_patch_failure));
+            mResultView.setText(getString(R.string.result_failure, seconds, result.message));
         }
+    }
+
+    private void setDetails(String details) {
+        mDetails = details;
+        mDetailsButton.setVisibility(details == null ? View.GONE : View.VISIBLE);
     }
 
     /**
@@ -297,7 +331,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 mPendingInstallPath = null;
                 InstallResultReceiver.abortInstall();
                 mStartButton.setEnabled(true);
-                showToast(getString(R.string.toast_install_settings_unavailable));
+                mInstallStatus.setText(R.string.toast_install_settings_unavailable);
             }
             return;
         }
@@ -322,7 +356,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         } else {
             InstallResultReceiver.abortInstall();
             mStartButton.setEnabled(true);
-            showToast(getString(R.string.toast_install_permission_denied));
+            mInstallStatus.setText(R.string.toast_install_permission_denied);
         }
     }
 
@@ -335,7 +369,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
             InstallResultReceiver.restoreInstallInProgress();
         }
         mStartButton.setEnabled(false);
-        mResultView.append("\n" + getString(R.string.status_preparing_install));
+        mInstallStatus.setText(R.string.status_preparing_install);
         try {
             mExecutor.execute(() -> {
                 try {
@@ -348,7 +382,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
                         mMainHandler.post(() -> {
                             if (!mDestroyed) {
                                 mStartButton.setEnabled(true);
-                                showToast(getString(R.string.toast_install_prepare_failure,
+                                mInstallStatus.setText(getString(R.string.toast_install_prepare_failure,
                                         e.getMessage() == null
                                             ? e.getClass().getSimpleName()
                                             : e.getMessage()));
@@ -361,7 +395,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
             InstallResultReceiver.abortInstall();
             mStartButton.setEnabled(true);
             Log.e(TAG, "install executor rejected task", e);
-            showToast(getString(R.string.toast_install_prepare_failure,
+            mInstallStatus.setText(getString(R.string.toast_install_prepare_failure,
                     e.getClass().getSimpleName()));
         }
     }
@@ -372,7 +406,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
             throw new IllegalStateException("Activity 已销毁");
         }
         startActivity(confirmationIntent);
-        mResultView.append("\n" + getString(R.string.status_install_confirmation_launched));
+        mInstallStatus.setText(R.string.status_install_confirmation_launched);
     }
 
     /** 将 PackageInstaller 最终结果同步回前台页面。 */
@@ -382,9 +416,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
         }
         mStartButton.setEnabled(true);
         if (success) {
-            mResultView.append("\n" + getString(R.string.status_install_success));
+            mInstallStatus.setText(R.string.status_install_success);
         } else {
-            mResultView.append("\n" + getString(R.string.status_install_failure, detail));
+            mInstallStatus.setText(getString(R.string.status_install_failure, detail));
         }
     }
 

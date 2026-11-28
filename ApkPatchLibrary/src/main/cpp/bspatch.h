@@ -45,7 +45,7 @@ extern "C" {
  * 用 patch 文件将 oldfile 合成为 newfile（bspatch 算法，BSDIFF40 格式）。
  *
  * @param oldfile   旧版本文件路径（客户端通常为已安装 apk 的 sourceDir）
- * @param newfile   合成结果输出路径（已存在则截断覆盖）
+ * @param newfile   合成结果输出路径（成功后原子替换已有输出）
  * @param patchfile 差分补丁文件路径（由服务端 bsdiff 生成）
  * @return 上述 BSPATCH_* 错误码之一；0 表示成功
  */

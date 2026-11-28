@@ -160,3 +160,11 @@ tasks.register('workerLifecycleTest', JavaExec) {
     dependsOn integrationTestClasses
 }
 tasks.named('check') { dependsOn 'workerLifecycleTest' }
+
+tasks.register('patchTimeoutTest', Exec) {
+    group = 'verification'
+    dependsOn fatJar
+    commandLine 'python3', file('src/integrationTest/python/patch_timeout.py'),
+            new File(System.getProperty('java.home'), 'bin/java'), fatJar.get().archiveFile.get().asFile
+}
+tasks.named('check') { dependsOn 'patchTimeoutTest' }

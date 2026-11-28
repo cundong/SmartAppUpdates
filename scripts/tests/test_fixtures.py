@@ -51,7 +51,7 @@ else:
         self.library = self.root / 'native'
         self.library.mkdir()
         (self.library / 'library.so').write_bytes(b'compiled-v1')
-        self.args = argparse.Namespace(built_apks=None, java=str(self.worker), classpath=str(self.root / 'classes'),
+        self.args = argparse.Namespace(fixture_dir=None, built_apks=None, java=str(self.worker), classpath=str(self.root / 'classes'),
                 library_path=str(self.library), output=self.root / 'output',
                 timeout_seconds=2, lock_timeout_seconds=2)
 
@@ -66,6 +66,24 @@ else:
         first = self.prepare()
         self.assertEqual(first, self.prepare())
         self.assertEqual(['diff', 'patch'], self.calls())
+
+    def test_supplied_patch_is_verified_and_reused(self):
+        folder = self.root / 'private-case'
+        (self.root / 'Apks').rename(folder)
+        self.args.fixture_dir = folder
+        patch_file = folder / 'update.patch'
+        patch_file.write_bytes((folder / 'new.apk').read_bytes())
+        manifest = folder / 'fixtures.json'
+        config = json.loads(manifest.read_text())
+        config['patch'] = dict(file=patch_file.name, sha256=fixtures.sha256(patch_file))
+        manifest.write_text(json.dumps(config))
+        self.prepare()
+        self.assertEqual(['patch'], self.calls())
+        self.assertEqual(patch_file.read_bytes(), (self.args.output / 'current/assets/update.patch').read_bytes())
+        patch_file.write_bytes(b'wrong patch')
+        with self.assertRaisesRegex(ValueError, 'SHA-256 mismatch'):
+            self.prepare()
+        self.assertEqual(['patch'], self.calls())
 
     def test_bad_original_is_rejected_before_worker(self):
         (self.root / 'Apks/old.apk').write_bytes(b'wrong input')
@@ -139,7 +157,7 @@ else:
     def test_concurrent_processes_generate_only_once(self):
         code = '''import argparse, importlib.util, pathlib, sys
 spec=importlib.util.spec_from_file_location('fixtures',sys.argv[1]);m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
-r=pathlib.Path(sys.argv[2]);a=argparse.Namespace(built_apks=None, java=str(r/'fake-java'),classpath=str(r/'classes'),library_path=str(r/'native'),output=r/'output',timeout_seconds=2,lock_timeout_seconds=3)
+r=pathlib.Path(sys.argv[2]);a=argparse.Namespace(fixture_dir=None, built_apks=None, java=str(r/'fake-java'),classpath=str(r/'classes'),library_path=str(r/'native'),output=r/'output',timeout_seconds=2,lock_timeout_seconds=3)
 m.prepare(a,r)
 '''
         command = [sys.executable, '-c', code, str(MODULE), str(self.root)]

@@ -1,0 +1,20 @@
+{
+  "displayName": "淘宝",
+  "packageName": "com.taobao.taobao",
+  "old": {
+    "file": "taobao-10.59.20.apk",
+    "versionName": "10.59.20",
+    "versionCode": 834,
+    "sha256": "910de93fbbfd4afe669822c2b4288094172da9c944dfa72e5e5fa8a18991c463"
+  },
+  "new": {
+    "file": "taobao-10.59.40.apk",
+    "versionName": "10.59.40",
+    "versionCode": 836,
+    "sha256": "93008ce4fdc6a41a33434c273cb295d5b7fa7ef7eb734ded23c1098a7e320e30"
+  },
+  "patch": {
+    "file": "update.patch",
+    "sha256": "8749502a7aa1dd73111726383b70e993fdc7e6f06f3f3080cfdb7239c9d81150"
+  }
+}

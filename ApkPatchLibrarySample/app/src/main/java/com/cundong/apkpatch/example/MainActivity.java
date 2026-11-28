@@ -79,6 +79,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
         });
         content.requestApplyInsets();
 
+        TextView fixture = findViewById(R.id.info1_view);
+        fixture.setText(getString(R.string.demo_info1, FixtureMetadata.DISPLAY_NAME,
+                FixtureMetadata.OLD_VERSION_NAME, FixtureMetadata.NEW_VERSION_NAME));
         mResultView = findViewById(R.id.result_view);
 
         mStartButton = findViewById(R.id.start_btn);

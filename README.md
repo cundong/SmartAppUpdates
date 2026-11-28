@@ -98,7 +98,7 @@ The old APK must match the version used to generate the patch byte for byte. A s
 
 ## Run the offline sample
 
-The build creates two revisions of a small project-owned Android app from
+A fresh checkout builds two revisions of a small project-owned Android app from
 [the fixture source](ApkPatchLibrarySample/fixture). Both use the local Android debug
 signing key. No APK download or preinstalled target app is required.
 
@@ -112,10 +112,12 @@ During the build the CLI generates a BSDIFF40 patch, reconstructs the target, an
 its SHA-256 and bytes. The Sample bundles only the old APK and patch. On the device
 it reconstructs `rebuilt.apk`, checks its digest, package and version, then opens the installer.
 
-For the optional large-APK check, supply the two local files specified in
-[Apks/fixtures.json](Apks/fixtures.json) and run
-`./gradlew -PsampleFixture=taobao :app:assembleDebug`. Their pinned hashes are checked
-before generation. The two modes keep separate generated assets and metadata.
+For the **Taobao 10.59.20 → 10.59.40** Demo, place the old APK, the supplied patch and
+the target APK alongside [the case manifest](Apks/taobao-10.59/fixtures.json). The next
+`:app:installDebug` selects this case. The Demo displays both versions, reconstructs
+Taobao on the phone and opens its system installation prompt. The build uses the full
+target APK to verify the result. See [local fixtures](Apks/README.md) for filenames,
+explicit case selection and the older Taobao test pair.
 
 ## Testing
 
@@ -136,7 +138,7 @@ Full checks and builds, including the public sample:
 
 The [CI workflow](.github/workflows/ci.yml) builds and lints the public Sample, runs an
 emulator upgrade test, and checks native peak RSS while reconstructing a 128 MiB test file.
-To repeat the device test after assembling Debug, select a test emulator with
+To repeat the device test after assembling Debug with `-PsampleFixture=public`, select a test emulator with
 `ANDROID_SERIAL`, put `adb` on PATH, and run `python3 scripts/smoke_sample.py`.
 
 ## Scope and limitations

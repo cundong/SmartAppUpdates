@@ -4,6 +4,7 @@ import re
 import subprocess
 import time
 import xml.etree.ElementTree as ET
+import zipfile
 
 ROOT = Path(__file__).resolve().parents[1] / 'ApkPatchLibrarySample'
 APP = 'com.cundong.apkpatch.example'
@@ -35,8 +36,13 @@ def main():
     variants = ROOT / 'fixture/build/outputs/apk'
     baseline, = (variants / 'baseline/debug').glob('*.apk')
     updated, = (variants / 'updated/debug').glob('*.apk')
+    sample = ROOT / 'app/build/outputs/apk/debug/app-debug.apk'
+    with zipfile.ZipFile(sample) as apk:
+        info = apk.getinfo('assets/old.apk')
+        if info.file_size != baseline.stat().st_size or apk.read(info) != baseline.read_bytes():
+            raise SystemExit('Build the public Sample with -PsampleFixture=public before running this test.')
     adb('install', '-r', '-d', str(baseline))
-    adb('install', '-r', str(ROOT / 'app/build/outputs/apk/debug/app-debug.apk'))
+    adb('install', '-r', str(sample))
     adb('shell', 'appops', 'set', APP, 'REQUEST_INSTALL_PACKAGES', 'allow')
     adb('shell', 'input', 'keyevent', 'KEYCODE_WAKEUP')
     adb('shell', 'wm', 'dismiss-keyguard')

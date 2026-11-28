@@ -41,3 +41,5 @@ local.properties
 
 __pycache__/
 *.pyc
+
+/Apks/taobao-10.59/update.patch

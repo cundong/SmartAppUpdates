@@ -1,10 +1,13 @@
 plugins { id 'com.android.application' }
-def fixtureMode = providers.gradleProperty('sampleFixture').getOrElse('public')
-if (!(fixtureMode in ['public', 'taobao'])) {
-    throw new GradleException("sampleFixture must be public or taobao")
+def taobaoCase = rootProject.file('Apks/taobao-10.59')
+def hasTaobaoInputs = !fileTree(taobaoCase) { include '*.apk', '*.patch' }.isEmpty()
+def fixtureMode = providers.gradleProperty('sampleFixture').getOrElse(hasTaobaoInputs ? 'taobao-10.59' : 'public')
+def outputDirs = [public: 'sample-fixtures', taobao: 'fixtures', 'taobao-10.59': 'taobao-10.59']
+if (!outputDirs.containsKey(fixtureMode)) {
+    throw new GradleException("Unknown sampleFixture: ${fixtureMode}. Choose from ${outputDirs.keySet()}")
 }
 def publicFixtures = fixtureMode == 'public'
-def generatedFixtures = layout.buildDirectory.dir(publicFixtures ? 'generated/sample-fixtures' : 'generated/fixtures')
+def generatedFixtures = layout.buildDirectory.dir("generated/${outputDirs[fixtureMode]}")
 
 android {
     namespace 'com.cundong.apkpatch.example'
@@ -46,6 +49,8 @@ tasks.register('verifyFixtures', Exec) {
             '--lock-timeout-seconds', providers.gradleProperty('fixtureLockTimeoutSeconds').getOrElse('900')
         if (publicFixtures) {
             args '--built-apks', project(':sampleFixture').layout.buildDirectory.dir('outputs/apk').get().asFile
+        } else if (fixtureMode == 'taobao-10.59') {
+            args '--fixture-dir', taobaoCase
         }
     }
 }

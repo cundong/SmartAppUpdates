@@ -98,7 +98,7 @@ if (result == PatchUtils.SUCCESS) {
 
 ## 运行离线示例
 
-构建会从[仓库中的测试应用源码](ApkPatchLibrarySample/fixture)生成 v1、v2 两个 APK，使用同一份本地 Android 调试签名。首次运行无需下载 APK 或预装旧版。
+首次检出时，构建会从[仓库中的测试应用源码](ApkPatchLibrarySample/fixture)生成 v1、v2 两个 APK，使用同一份本地 Android 调试签名。首次运行无需下载 APK 或预装旧版。
 
 ```sh
 ./gradlew :app:assembleDebug
@@ -107,7 +107,7 @@ if (result == PatchUtils.SUCCESS) {
 
 打开 **ApkPatchSample**，点击“开始本地合成”，按系统提示确认安装。构建时，CLI 生成补丁，回放后校验目标 APK 的 SHA-256 并逐字节比较。示例只打包旧 APK 和补丁，在设备上合成 `rebuilt.apk`，校验摘要、包名和版本后打开安装器。
 
-如需用淘宝大包验证，将 [Apks/fixtures.json](Apks/fixtures.json) 指定的两个文件放入本地 `Apks/` 目录，运行 `./gradlew -PsampleFixture=taobao :app:assembleDebug`。构建会校验清单固定的 SHA-256，两种模式各自保存生成文件。
+**淘宝 10.59.20 → 10.59.40** 案例使用已有的旧 APK、补丁和目标 APK。将三个文件放到[案例清单](Apks/taobao-10.59/fixtures.json)所在目录，再运行 `./gradlew :app:installDebug`。Demo 会显示淘宝和两个版本号，点击“开始本地合成”即可在手机上还原新版淘宝，并打开系统安装确认页。构建阶段会校验三个文件的 SHA-256，并将回放结果与目标 APK 逐字节比对。文件名、显式选择案例的参数和旧版淘宝样本见[本地样本说明](Apks/README.md)。
 
 ## 测试与验证
 
@@ -126,7 +126,7 @@ git diff --check
 ./gradlew :app:assembleRelease :app:lintRelease
 ```
 
-[CI 工作流](.github/workflows/ci.yml)构建公开示例、运行 Lint，在模拟器上验证从 v1 到 v2 的升级，并检查合成 128 MiB 文件时的原生进程峰值内存。要在本地复验，构建 Debug 版，将 `adb` 加入 PATH，用 `ANDROID_SERIAL` 指定测试模拟器，再运行 `python3 scripts/smoke_sample.py`。
+[CI 工作流](.github/workflows/ci.yml)构建公开示例、运行 Lint，在模拟器上验证从 v1 到 v2 的升级，并检查合成 128 MiB 文件时的原生进程峰值内存。要在本地复验，使用 `-PsampleFixture=public` 构建 Debug 版，将 `adb` 加入 PATH，用 `ANDROID_SERIAL` 指定测试模拟器，再运行 `python3 scripts/smoke_sample.py`。
 
 ## 适用范围与限制
 

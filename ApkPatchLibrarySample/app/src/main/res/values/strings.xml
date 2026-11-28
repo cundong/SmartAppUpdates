@@ -3,7 +3,7 @@
     <string name="app_name">ApkPatchSample</string>
 
     <string name="demo_title">APK 本地增量合成演示</string>
-    <string name="demo_info1">1. 旧版示例 APK 和差分包已就绪</string>
+    <string name="demo_info1">%1$s　%2$s → %3$s</string>
     <string name="demo_info2">2. 点击开始后，Demo 在本地复制输入并调用 ApkPatchLibrary 合成新版 APK</string>
     <string name="demo_info3">3. 输入与输出均通过 SHA-256 校验；成功后自动拉起系统安装确认页</string>
     <string name="demo_start">开始本地合成</string>

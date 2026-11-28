@@ -11,7 +11,7 @@ One root Gradle build: `:apkPatchLibrary` (Android), `:app` (Sample), `:server` 
 Run from the repository root, using `./gradlew`:
 
 - Native/host/library: `:apkPatchLibrary:check :apkPatchLibrary:assembleRelease :server:build`.
-- Optional Taobao flow: `-PsampleFixture=taobao verifyFixtures :app:assembleDebug :app:lintDebug`.
+- Older Taobao flow: `-PsampleFixture=taobao verifyFixtures :app:assembleDebug :app:lintDebug`.
 - Complete local verification: `check build`, then `git diff --check`.
 - Native-only without Android: `sh ApkPatchLibrary/scripts/run-host-native-tests.sh`.
 
@@ -25,7 +25,7 @@ CI builds and runs the source-built public Sample. The optional proprietary APK 
 - Patch input must be bounded and failures must return errors and clean up partial output.
 - Server diff currently uses isolated worker JVMs because legacy diff still calls err/errx.
 - Keep native 16 KB page alignment; do not set 64-bit file-offset macros on minSdk 21/32-bit Android.
-- `Apks/fixtures.json` pins the only real APK pair. Never silently update hashes to hide mismatches.
+- `Apks/fixtures.json` pins the older pair, and `Apks/taobao-10.59/fixtures.json` pins the APKs and patch for the local Taobao Demo. Never silently update hashes to hide mismatches.
 - `scripts/prepare_fixtures.py` owns assets and FixtureMetadata; never hand-edit generated files.
 - Preserve system installation confirmation and output hash/package/version validation.
 - Keep small malformed-input and synthetic round-trip tests; real APKs cannot replace boundary tests.

@@ -107,7 +107,7 @@ signing key. No APK download or preinstalled target app is required.
 ./gradlew :app:installDebug
 ```
 
-Open **ApkPatchSample**, tap **开始本地合成**, and confirm installation when prompted.
+Open **ApkPatchSample**, tap **合成并安装**, and confirm installation when prompted.
 During the build the CLI generates a BSDIFF40 patch, reconstructs the target, and checks
 its SHA-256 and bytes. The Sample bundles only the old APK and patch. On the device
 it reconstructs `rebuilt.apk`, checks its digest, package and version, then opens the installer.

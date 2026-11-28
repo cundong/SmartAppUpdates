@@ -1,7 +1,7 @@
 # Offline Android Sample
 
 Run `./gradlew :app:installDebug` from the repository root and open **ApkPatchSample**.
-Tap **开始本地合成** to reconstruct the target APK and open the system installer.
+Tap **合成并安装** to reconstruct the target APK and open the system installer.
 
 On a fresh checkout the build signs two revisions of the [fixture app](fixture) with the local debug key,
 generates the patch and verifies the reconstructed bytes. The fixture app has no launcher

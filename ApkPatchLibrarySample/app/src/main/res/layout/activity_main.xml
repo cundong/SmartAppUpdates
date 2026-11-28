@@ -8,59 +8,127 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="@dimen/activity_horizontal_margin">
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="12dp"
+        android:paddingBottom="24dp">
 
-        <TextView
-            android:id="@+id/title_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:text="@string/demo_title"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/info1_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:lineSpacingMultiplier="1.5" />
-
-        <TextView
-            android:id="@+id/info2_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:lineSpacingMultiplier="1.5"
-            android:text="@string/demo_info2"
-            android:textSize="14sp" />
-
-        <TextView
-            android:id="@+id/info3_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:lineSpacingMultiplier="1.5"
-            android:text="@string/demo_info3"
-            android:textSize="14sp" />
-
-        <Button
-            android:id="@+id/start_btn"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/demo_start" />
+            android:gravity="center_vertical">
 
-        <Button
-            android:id="@+id/github_btn"
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/demo_title"
+                android:textColor="@color/ink"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/github_btn"
+                style="@style/TextAction"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/demo_github" />
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/demo_github" />
+            android:layout_marginTop="20dp"
+            android:background="@drawable/update_panel"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <TextView
+                android:id="@+id/fixture_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/ink"
+                android:textSize="32sp"
+                android:textStyle="bold" />
+
+            <TextView
+                style="@style/VersionLabel"
+                android:layout_marginTop="4dp"
+                android:text="@string/demo_description" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="24dp"
+                android:background="@color/line" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:baselineAligned="false"
+                android:gravity="center_vertical">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+                    <TextView style="@style/VersionLabel" android:text="@string/demo_old_version" />
+                    <TextView android:id="@+id/old_version" style="@style/VersionNumber" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:importantForAccessibility="no"
+                    android:paddingLeft="8dp"
+                    android:paddingRight="8dp"
+                    android:text="@string/version_arrow"
+                    android:textColor="@color/secondary"
+                    android:textSize="20sp" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+                    <TextView style="@style/VersionLabel" android:text="@string/demo_new_version" />
+                    <TextView android:id="@+id/new_version" style="@style/VersionNumber" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/start_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:background="@drawable/primary_action"
+                android:minHeight="50dp"
+                android:stateListAnimator="@null"
+                android:text="@string/demo_start"
+                android:textColor="@color/surface"
+                android:textSize="16sp" />
+        </LinearLayout>
 
         <TextView
             android:id="@+id/result_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            style="@style/VersionNumber"
             android:layout_marginTop="16dp"
-            android:paddingBottom="24dp"
-            android:textIsSelectable="true" />
+            android:accessibilityLiveRegion="polite"
+            android:textSize="16sp" />
 
+        <TextView
+            android:id="@+id/install_status"
+            style="@style/VersionLabel"
+            android:accessibilityLiveRegion="polite" />
+
+        <Button
+            android:id="@+id/details_btn"
+            style="@style/TextAction"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/demo_details"
+            android:visibility="gone" />
     </LinearLayout>
-
 </ScrollView>

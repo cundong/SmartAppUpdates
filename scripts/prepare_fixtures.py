@@ -106,7 +106,7 @@ def validate_inputs(directory):
 
 def built_inputs(apk_dir):
     """Use the APK and version metadata from each single-output AGP debug variant."""
-    config, paths = {}, {}
+    config, paths = {'displayName': '示例应用'}, {}
     for role, flavor in [('old', 'baseline'), ('new', 'updated')]:
         directory = apk_dir / flavor / 'debug'
         metadata = json.loads((directory / 'output-metadata.json').read_text())

@@ -11,3 +11,5 @@ activity. The Sample checks the APK digest, package and version before requestin
 
 With the three local inputs for [Taobao 10.59.20 → 10.59.40](../Apks/README.md), the same command installs the Taobao Demo. It reuses the supplied patch. The older pinned pair remains available with `-PsampleFixture=taobao`. For slow hosts, the Gradle properties
 `fixtureTimeoutSeconds` and `fixtureLockTimeoutSeconds` control generation and lock timeouts.
+
+<img src="screenshots/taobao-demo.png" width="280" alt="Taobao 10.59.20 to 10.59.40 in the Android sample">

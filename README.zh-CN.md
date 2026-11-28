@@ -107,7 +107,9 @@ if (result == PatchUtils.SUCCESS) {
 
 打开 **ApkPatchSample** 查看新旧版本。点击「合成并安装」，Demo 会用内置的旧 APK 和补丁合成 `rebuilt.apk`，校验 SHA-256、包名和版本后打开系统安装确认页。返回 Demo 可查看合成耗时和文件大小，点「校验详情」可查看 SHA-256 和输出路径。
 
-要演示 **淘宝 10.59.20 → 10.59.40**，将旧 APK、补丁和目标 APK 放到[案例清单](Apks/taobao-10.59/fixtures.json)所在目录，再运行 `./gradlew :app:installDebug`。构建时会校验三个文件的 SHA-256，并将补丁合成结果与目标 APK 逐字节比对。文件名和案例选择参数见[本地样本说明](Apks/README.md)。
+要演示 **淘宝 10.59.20 → 10.59.40**，将 `taobao-10.59.20.apk`、`update.patch` 和 `taobao-10.59.40.apk` 放到 `Apks/taobao-10.59/`，再运行 `./gradlew :app:installDebug`。这三个本地文件由 Git 忽略。Demo 打包旧版和补丁，包内路径分别为 `assets/old.apk` 和 `assets/update.patch`。完整的 10.59.40 APK 仅供构建时与合成结果逐字节比对。案例选择参数见[本地样本说明](Apks/README.md)。
+
+<img src="ApkPatchLibrarySample/screenshots/taobao-demo.png" width="280" alt="淘宝增量更新示例，旧版本 10.59.20，新版本 10.59.40，底部为「合成并安装」按钮">
 
 ## 测试与验证
 
@@ -127,6 +129,8 @@ git diff --check
 ```
 
 [CI 工作流](.github/workflows/ci.yml)构建公开示例、运行 Lint，在模拟器上验证从 v1 到 v2 的升级，并检查合成 128 MiB 文件时的原生进程峰值内存。要在本地复验，使用 `-PsampleFixture=public` 构建 Debug 版，将 `adb` 加入 PATH，用 `ANDROID_SERIAL` 指定测试模拟器，再运行 `python3 scripts/smoke_sample.py`。
+
+淘宝 10.59 的[真机验收步骤](VALIDATION.md#taobao-1059-on-a-phone)会核对合成文件的 SHA-256，并在系统安装确认页取消安装。
 
 ## 适用范围与限制
 

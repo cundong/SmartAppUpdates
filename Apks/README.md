@@ -12,8 +12,8 @@ Keep the following three files beside [the case manifest](taobao-10.59/fixtures.
 
 The version names and codes come from the two APK manifests. Both APKs use
 `com.taobao.taobao`. The build validates all three hashes, replays the supplied patch
-and compares the result byte for byte with the target. Only the baseline and patch go
-into the Demo. Opening the Demo and tapping **开始本地合成** reconstructs the target on
+and compares the result byte for byte with the target. The demo bundles the baseline
+as `assets/old.apk` and the patch as `assets/update.patch`. Tapping **合成并安装** reconstructs the target on
 the phone and launches the Android installer.
 
 `./gradlew :app:installDebug` selects this case when its local inputs are present.

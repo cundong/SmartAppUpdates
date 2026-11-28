@@ -5,12 +5,26 @@ import re
 import subprocess
 
 root = Path(__file__).resolve().parents[1]
-files = subprocess.check_output(['git', 'ls-files', '-z', '--cached', '--others', '--exclude-standard'], cwd=root).split(b'\0')
+
+
+def git_paths(*args):
+    output = subprocess.check_output(['git', *args], cwd=root)
+    return {name.decode('utf-8') for name in output.split(b'\0') if name}
+
+
+magic = b'BSDIFF40'
+files = git_paths('ls-files', '-z', '--cached', '--others', '--exclude-standard')
 failures = []
-for raw in set(files):
-    if not raw:
-        continue
-    name = raw.decode('utf-8')
+# A staged patch can still be committed after the working copy is replaced or removed.
+staged = git_paths('diff', '--cached', '--no-renames', '--name-only', '--diff-filter=AMT', '-z')
+for name in sorted(staged & git_paths('diff', '--name-only', '-z')):
+    with subprocess.Popen(['git', 'cat-file', 'blob', ':' + name], cwd=root,
+                          stdout=subprocess.PIPE) as blob:
+        with blob.stdout as stream:
+            if stream.read(len(magic)) == magic:
+                failures.append('Staged BSDIFF40 binary patch: ' + name)
+
+for name in sorted(files):
     path = root / name
     if not path.is_file():
         continue  # deletions from the legacy checkout are expected
@@ -18,6 +32,11 @@ for raw in set(files):
             or any(part in {'.idea', '.gradle', '.cxx', 'build'} for part in path.relative_to(root).parts)
             or path.name in {'.DS_Store', 'local.properties', '.env'}):
         failures.append('Non-source file eligible for commit: ' + name)
+        continue
+    with path.open('rb') as stream:
+        if stream.read(len(magic)) == magic:
+            failures.append('BSDIFF40 binary patch eligible for commit: ' + name)
+            continue
     if path.suffix.lower() in {'.jar', '.png'}:
         continue
     try:
@@ -28,4 +47,4 @@ for raw in set(files):
         failures.append('Private key marker: ' + name)
 if failures:
     raise SystemExit('\n'.join(sorted(failures)))
-print('Repository hygiene passed (APKs, generated files and private keys excluded).')
+print('Repository hygiene passed (APKs, BSDIFF40 patches, generated files and private keys excluded).')

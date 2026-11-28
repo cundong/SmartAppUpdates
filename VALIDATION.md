@@ -79,3 +79,25 @@ target SHA-256. These measurements exclude the Sample UI, Java runtime and insta
 The host regression generates its own 128 MiB input, checks the output SHA-256, and
 requires peak decoder RSS below 64 MiB. Run it with
 `sh ApkPatchLibrary/scripts/run-host-native-tests.sh`.
+
+## Taobao 10.59 on a phone
+
+Supply the [three local files](Apks/README.md), unlock the test phone and put `adb`
+on PATH. The demo needs permission to request app installs. From the repository root run
+
+```sh
+./gradlew -PsampleFixture=taobao-10.59 :app:assembleDebug
+adb devices
+ANDROID_SERIAL=DEVICE_ID python3 scripts/smoke_taobao.py
+```
+
+Replace `DEVICE_ID` with the device ID from `adb devices`. The script installs the
+debug demo, checks the two version labels and starts reconstruction. It waits for a **new**
+committed session from the demo targeting `com.taobao.taobao` and the system installer
+in the foreground. It dismisses the prompt, opens **校验详情** and compares the SHA-256
+shown for `rebuilt.apk` with the [case manifest](Apks/taobao-10.59/fixtures.json).
+
+On 2026-11-28 this check passed on a Xiaomi 14 Pro running Android 16. The demo rebuilt
+10.59.40 from 10.59.20 and the supplied patch. The test ended after dismissing installation
+confirmation and verifying the digest. The [public emulator test](scripts/smoke_sample.py)
+separately completes installation of the project-owned fixture and checks the installed bytes.

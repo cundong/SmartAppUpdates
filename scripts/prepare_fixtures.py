@@ -221,6 +221,9 @@ def prepare(args, root=None):
     out = args.output.resolve()
     with output_lock(out, args.lock_timeout_seconds):
         config, paths = built_inputs(args.built_apks) if args.built_apks else validate_inputs(args.fixture_dir or root / 'Apks')
+        print(f"Sample versions: {config['packageName']} "
+              f"{config['old']['versionName']} ({config['old']['versionCode']}) -> "
+              f"{config['new']['versionName']} ({config['new']['versionCode']})", flush=True)
         fingerprint = source_fingerprint(root, args, config)
         cached = cached_result(out, fingerprint, config)
         if cached is not None:

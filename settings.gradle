@@ -11,3 +11,5 @@ include ':apkPatchLibrary', ':app', ':server'
 project(':apkPatchLibrary').projectDir = file('ApkPatchLibrary')
 project(':app').projectDir = file('ApkPatchLibrarySample/app')
 project(':server').projectDir = file('ApkPatchLibraryServer')
+include ':sampleFixture'
+project(':sampleFixture').projectDir = file('ApkPatchLibrarySample/fixture')

@@ -69,6 +69,6 @@ java -jar build/libs/ApkPatchLibraryServer-2.0-all.jar \
 ```
 
 Patch and bzip2 sources are shared with the Android library. The CLI remains generic;
-`./gradlew verifyFixtures` runs the real Taobao pair from `Apks/fixtures.json`.
+`./gradlew -PsampleFixture=taobao verifyFixtures` runs the real Taobao pair from `Apks/fixtures.json`.
 
 CLI 可在命令前加 `--timeout-seconds N`（1–86400，默认 900）。超时与中断会回收 worker，失败不发布输出。

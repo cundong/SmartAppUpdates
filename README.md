@@ -14,7 +14,7 @@ Patch size depends on the differences between the APKs; a smaller download is no
 | --- | --- | --- |
 | `ApkPatchLibrary` | Android AAR exposing the Java/JNI patch API | [Library](ApkPatchLibrary/README.md) |
 | `ApkPatchLibraryServer` | Java/JNI CLI for generating and applying patches on macOS and Linux | [CLI](ApkPatchLibraryServer/README.md) |
-| `ApkPatchLibrarySample` | Offline Android sample using a locally supplied APK pair | [Sample](ApkPatchLibrarySample/README.md) |
+| `ApkPatchLibrarySample` | Offline Android sample using a source-built test app | [Sample](ApkPatchLibrarySample/README.md) |
 
 The CLI and Android library share the same patch parser and bzip2 sources. The parser validates patch structure and bounds and reports native failures through error codes. The CLI isolates native operations in worker JVMs, with timeouts and temporary-output cleanup.
 
@@ -98,34 +98,24 @@ The old APK must match the version used to generate the patch byte for byte. A s
 
 ## Run the offline sample
 
-The sample uses the APK pair pinned in [Apks/fixtures.json](Apks/fixtures.json):
-
-| Role | Local file | Package | Version code |
-| --- | --- | --- | ---: |
-| Old | `Apks/淘宝v10.65.10.apk` | `com.taobao.taobao` | 855 |
-| New | `Apks/淘宝v10.65.20.apk` | `com.taobao.taobao` | 856 |
-
-These third-party APKs are **not distributed with the repository**. Supply matching files locally to build the sample. They are ignored by Git; Git LFS is not required. The library and CLI can be built without them.
+The build creates two revisions of a small project-owned Android app from
+[the fixture source](ApkPatchLibrarySample/fixture). Both use the local Android debug
+signing key. No APK download or preinstalled target app is required.
 
 ```sh
-./gradlew verifyFixtures :app:assembleDebug :app:lintDebug
-# Install on a connected, authorized Android device:
+./gradlew :app:assembleDebug
 ./gradlew :app:installDebug
 ```
 
-Sample builds automatically prepare the assets. Preparation verifies both input SHA-256 digests, generates `update.patch`, reconstructs the target with the shared patch implementation, and checks both SHA-256 and byte-for-byte equality. A failed check stops the build.
+Open **ApkPatchSample**, tap **开始本地合成**, and confirm installation when prompted.
+During the build the CLI generates a BSDIFF40 patch, reconstructs the target, and checks
+its SHA-256 and bytes. The Sample bundles only the old APK and patch. On the device
+it reconstructs `rebuilt.apk`, checks its digest, package and version, then opens the installer.
 
-Only `old.apk` and `update.patch` are bundled as sample assets. The full new APK is used for build-time verification. On device, the sample verifies its inputs, reconstructs `taobao-10.65.20.apk`, checks its digest, package name, and version, and opens the system installer. Installation requires user confirmation and remains subject to Android's signature and version checks.
-
-Generated resources are stored under `ApkPatchLibrarySample/app/build/generated/fixtures/current/`. Do not edit them manually. Preparation uses a bounded file lock and publishes complete verified generations atomically; failed preparation preserves the previous generation. Cache validation includes inputs, generator code, build configuration, and compiled artifacts.
-
-For slower hosts:
-
-```sh
-./gradlew verifyFixtures -PfixtureTimeoutSeconds=1200 -PfixtureLockTimeoutSeconds=1200
-```
-
-Both limits default to 900 seconds. First-time generation can take several minutes and substantial memory. Old generations are removed by `:app:clean`; do not run cleanup concurrently with a build.
+For the optional large-APK check, supply the two local files specified in
+[Apks/fixtures.json](Apks/fixtures.json) and run
+`./gradlew -PsampleFixture=taobao :app:assembleDebug`. Their pinned hashes are checked
+before generation. The two modes keep separate generated assets and metadata.
 
 ## Testing
 
@@ -137,21 +127,24 @@ python3 scripts/check_repository.py
 git diff --check
 ```
 
-Full local checks and builds, including the sample, require both APKs:
+Full checks and builds, including the public sample:
 
 ```sh
 ./gradlew check build
 ./gradlew :app:assembleRelease :app:lintRelease
 ```
 
-The [GitHub Actions workflow](.github/workflows/ci.yml) covers native and JNI regressions, fixture-generation infrastructure, CLI round trips and relocated distributions, and Android library builds. It does not download third-party APKs or run the real-APK sample flow. Synthetic boundary tests complement the real-APK checks.
+The [CI workflow](.github/workflows/ci.yml) builds and lints the public Sample, runs an
+emulator upgrade test, and checks native peak RSS while reconstructing a 128 MiB test file.
+To repeat the device test after assembling Debug, select a test emulator with
+`ANDROID_SERIAL`, put `adb` on PATH, and run `python3 scripts/smoke_sample.py`.
 
 ## Scope and limitations
 
 - Supports reconstruction of a single APK. Split APK installation and Android App Bundle delivery are outside the current scope.
 - Does not provide update hosting, download orchestration, signed update metadata, or rollback policy. Production integrations must define their own trust and delivery model; fixed sample hashes are not a metadata authentication service.
 - Reconstruction and installation are separate steps. Android can reject an otherwise correctly reconstructed APK because of device compatibility, signing, or version constraints.
-- Keep files below 2 GB when targeting 32-bit ABIs. Diff generation can use substantially more memory than the input size.
+- Keep files below 2 GB when targeting 32-bit ABIs. Patch application reads and writes in 64 KiB chunks using 128 KiB of work buffers plus bzip2 state. Diff generation can use substantially more memory than the input size.
 
 ## Contributing
 

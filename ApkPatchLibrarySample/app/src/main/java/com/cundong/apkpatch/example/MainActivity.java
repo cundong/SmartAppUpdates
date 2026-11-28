@@ -237,7 +237,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
             return LocalPatchResult.failure("native 合成失败，错误码：" + patchResult);
         }
 
-        // 4. 校验输出。只有与 Apks/淘宝v10.65.20.apk 的基准摘要一致才算演示成功。
+        // 4. 校验输出。只有与 目标 APK 的基准摘要一致才算演示成功。
         publishStatus(R.string.status_verifying_output);
         try {
             String newSha256 = HashUtils.sha256(newApkFile);

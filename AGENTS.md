@@ -11,12 +11,12 @@ One root Gradle build: `:apkPatchLibrary` (Android), `:app` (Sample), `:server` 
 Run from the repository root, using `./gradlew`:
 
 - Native/host/library: `:apkPatchLibrary:check :apkPatchLibrary:assembleRelease :server:build`.
-- Real Taobao flow: `verifyFixtures :app:assembleDebug :app:lintDebug`.
+- Optional Taobao flow: `-PsampleFixture=taobao verifyFixtures :app:assembleDebug :app:lintDebug`.
 - Complete local verification: `check build`, then `git diff --check`.
 - Native-only without Android: `sh ApkPatchLibrary/scripts/run-host-native-tests.sh`.
 
 See README for pinned toolchains. Report exactly what was run and any device/network limitations.
-CI cannot run the proprietary APK flow without local inputs. Do not invent passing results.
+CI builds and runs the source-built public Sample. The optional proprietary APK flow needs local inputs. Do not invent passing results.
 
 ## Contracts
 

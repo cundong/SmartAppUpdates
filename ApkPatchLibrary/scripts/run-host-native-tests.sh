@@ -36,3 +36,4 @@ done
 
 "$compiler" "$@" -o "$build_dir/bspatch_test"
 "$build_dir/bspatch_test"
+python3 "$project_dir/src/test/native/streaming_rss.py" "$build_dir/bspatch_test"

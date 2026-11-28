@@ -1,0 +1,24 @@
+plugins { id 'com.android.application' }
+
+android {
+    namespace 'com.cundong.smartappupdates.fixture'
+    compileSdk 36
+    defaultConfig {
+        applicationId 'com.cundong.smartappupdates.fixture'
+        minSdk 21
+        targetSdk 36
+    }
+    flavorDimensions 'revision'
+    productFlavors {
+        baseline {
+            dimension 'revision'
+            versionCode 1
+            versionName '1.0'
+        }
+        updated {
+            dimension 'revision'
+            versionCode 2
+            versionName '2.0'
+        }
+    }
+}

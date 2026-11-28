@@ -51,7 +51,7 @@ else:
         self.library = self.root / 'native'
         self.library.mkdir()
         (self.library / 'library.so').write_bytes(b'compiled-v1')
-        self.args = argparse.Namespace(java=str(self.worker), classpath=str(self.root / 'classes'),
+        self.args = argparse.Namespace(built_apks=None, java=str(self.worker), classpath=str(self.root / 'classes'),
                 library_path=str(self.library), output=self.root / 'output',
                 timeout_seconds=2, lock_timeout_seconds=2)
 
@@ -139,7 +139,7 @@ else:
     def test_concurrent_processes_generate_only_once(self):
         code = '''import argparse, importlib.util, pathlib, sys
 spec=importlib.util.spec_from_file_location('fixtures',sys.argv[1]);m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
-r=pathlib.Path(sys.argv[2]);a=argparse.Namespace(java=str(r/'fake-java'),classpath=str(r/'classes'),library_path=str(r/'native'),output=r/'output',timeout_seconds=2,lock_timeout_seconds=3)
+r=pathlib.Path(sys.argv[2]);a=argparse.Namespace(built_apks=None, java=str(r/'fake-java'),classpath=str(r/'classes'),library_path=str(r/'native'),output=r/'output',timeout_seconds=2,lock_timeout_seconds=3)
 m.prepare(a,r)
 '''
         command = [sys.executable, '-c', code, str(MODULE), str(self.root)]

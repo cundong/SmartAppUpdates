@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build verified Taobao Sample inputs with bounded workers and atomic publication."""
+"""Build verified Sample inputs with bounded workers and atomic publication."""
 import argparse
 from contextlib import contextmanager
 import fcntl
@@ -98,10 +98,30 @@ def validate_inputs(root):
     return config, paths
 
 
-def source_fingerprint(root, args):
+def built_inputs(apk_dir):
+    """Use the APK and version metadata from each single-output AGP debug variant."""
+    config, paths = {}, {}
+    for role, flavor in [('old', 'baseline'), ('new', 'updated')]:
+        directory = apk_dir / flavor / 'debug'
+        metadata = json.loads((directory / 'output-metadata.json').read_text())
+        artifact, = metadata['elements']
+        path = directory / artifact['outputFile']
+        package = metadata['applicationId']
+        if config.setdefault('packageName', package) != package:
+            raise ValueError('Fixture APK package names differ')
+        config[role] = dict(file=path.name, versionCode=artifact['versionCode'],
+                            versionName=artifact['versionName'], sha256=sha256(path))
+        paths[role] = path
+    if config['old']['versionCode'] >= config['new']['versionCode']:
+        raise ValueError('New APK versionCode must be greater than old APK versionCode')
+    return config, paths
+
+
+def source_fingerprint(root, args, config):
     """Include generator, build settings, tool identity and actual compiled inputs."""
     digest = hashlib.sha256(('fixture-schema=' + str(SCHEMA)).encode())
-    files = {root / 'Apks/fixtures.json', root / 'scripts/prepare_fixtures.py',
+    digest.update(json.dumps(config, sort_keys=True).encode())
+    files = {root / 'scripts/prepare_fixtures.py',
              root / 'build.gradle', root / 'settings.gradle', root / 'gradle.properties',
              root / 'gradle/wrapper/gradle-wrapper.properties',
              root / 'ApkPatchLibraryServer/build.gradle', root / 'ApkPatchLibrary/build.gradle'}
@@ -192,12 +212,12 @@ def prepare(args, root=None):
     root = root or ROOT
     out = args.output.resolve()
     with output_lock(out, args.lock_timeout_seconds):
-        config, paths = validate_inputs(root)
-        fingerprint = source_fingerprint(root, args)
+        config, paths = built_inputs(args.built_apks) if args.built_apks else validate_inputs(root)
+        fingerprint = source_fingerprint(root, args, config)
         cached = cached_result(out, fingerprint, config)
         if cached is not None:
             refresh_aliases(out)
-            print('Verified cached Taobao fixtures: ' + json.dumps(cached), flush=True)
+            print('Verified cached fixtures: ' + json.dumps(cached), flush=True)
             return cached
         (out / 'generations').mkdir(exist_ok=True)
         java = [args.java, '-Djava.library.path=' + str(Path(args.library_path).resolve()),
@@ -215,11 +235,11 @@ def prepare(args, root=None):
                 shutil.copyfile(paths[role], destination)
                 if sha256(destination) != config[role]['sha256']:
                     raise ValueError(role + ' APK changed while copying')
-            print('Generating Taobao delta from verified input copies...', flush=True)
+            print('Generating delta from verified input copies...', flush=True)
             run_process(java + ['diff', str(old), str(expected), str(patch)], args.timeout_seconds + 5)
             run_process(java + ['patch', str(old), str(rebuilt), str(patch)], args.timeout_seconds + 5)
             if sha256(rebuilt) != config['new']['sha256']:
-                raise ValueError('Rebuilt APK does not match the new Taobao APK')
+                raise ValueError('Rebuilt APK does not match the expected APK')
             with rebuilt.open('rb') as left, expected.open('rb') as right:
                 while True:
                     block = left.read(1024 * 1024)
@@ -239,12 +259,13 @@ def prepare(args, root=None):
             rebuilt.unlink()
             publish(out, stage)
         refresh_aliases(out)
-        print('Verified local Taobao fixtures: ' + json.dumps(cached), flush=True)
+        print('Verified local fixtures: ' + json.dumps(cached), flush=True)
         return cached
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--built-apks', type=Path, help='AGP APK output directory for the public sample fixture')
     parser.add_argument('--java', default=shutil.which('java') or 'java')
     parser.add_argument('--classpath', default=str(ROOT / 'ApkPatchLibraryServer/build/classes/java/main'))
     parser.add_argument('--library-path', default=str(ROOT / 'ApkPatchLibraryServer/build/native'))
